@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Card, message, Typography, Image } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { login, clearError } from '../store/slices/authSlice';
-import logo from '../../../Hrms-ui/src/logo.svg';
+import logo from '../assets/images/logo.svg';
 const { Title } = Typography;
 
 const Login = () => {
