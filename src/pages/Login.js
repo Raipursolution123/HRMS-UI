@@ -120,7 +120,7 @@ const Login = () => {
             </Button>
           </Form.Item>
         </Form>
-           <div style={{ textAlign: 'center', marginTop: 16 }}>
+           {/* <div style={{ textAlign: 'center', marginTop: 16 }}>
           <p style={{ color: '#999', fontSize: 12 }}>
             Demo Credentials: admin@hrms.com / password
           </p>
@@ -133,7 +133,7 @@ const Login = () => {
           <a href="#" style={{ color: '#6f53e1', fontSize: 14 }}>
             Visit Application Front End
           </a>
-        </div>
+        </div> */}
       </Card>
     </div>
   );

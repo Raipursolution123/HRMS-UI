@@ -454,6 +454,40 @@ const MainLayout = () => {
         collapsedWidth={screens.lg ? 80 : 0}
         width={250}
       >
+         <div 
+      style={{ 
+        padding: collapsed ? '16px 8px' : '16px', 
+        textAlign: 'center',
+        borderBottom: '1px solid rgba(255,255,255,0.1)'
+      }}
+    >
+      {collapsed ? (
+        <Avatar 
+          size="large" 
+          icon={<UserOutlined />}
+          style={{ backgroundColor: '#87d068' }}
+        />
+      ) : (
+        <div>
+          <Avatar 
+            size={64} 
+            icon={<UserOutlined />}
+            style={{ 
+              backgroundColor: '#87d068',
+              marginBottom: '12px'
+            }}
+          />
+          <div style={{ color: 'white' }}>
+            <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+              {user?.name || 'Admin'}
+            </div>
+            <div style={{ fontSize: '12px', opacity: 0.7 }}>
+              {user?.role || 'Administrator'}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
         <div className="logo">
           {collapsed ? 'HR' : 'HRMS'}
         </div>
