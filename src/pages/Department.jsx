@@ -114,12 +114,12 @@ const Department = () => {
     setIsConfirmOpen(false);
     setSelectedDept(null);
   }
-};
+ };
 
-const handleCancelDelete = () => {
+ const handleCancelDelete = () => {
   setIsConfirmOpen(false);
   setSelectedDept(null);
-};
+ };
 
 
   const handleAddNew = () => {

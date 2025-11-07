@@ -1,60 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, Button, Space, Card, Row, Col, Select, message, Input } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import DesignationModal from '../components/common/SharedModal/DesignationModal';
-import { useDesignations } from '../hooks/useDesignations';
-import { departmentAPI } from '../services/departmentServices';
+import SharedModal from '../components/common/SharedModal/SharedModal';
+import { useBranches } from '../hooks/useBranches';
 import ConfirmModal from '../components/common/SharedModal/ConfirmModal';
 const { Option } = Select;
 
-const Designation = () => {
+const Branch = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [selectedDesignation, setSelectedDesignation] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState(null);
 
-  // editing state
-  const [editingDesignation, setEditingDesignation] = useState(null);
+  // added editingBranch state
+  const [editingBranch, setEditingBranch] = useState(null);
 
   const [searchText, setSearchText] = useState('');
 
-  const { designations, loading, error, refetch, addDesignation, updateDesignation, deleteDesignation } = useDesignations();
+  const { branches, loading, error, refetch, addBranch, updateBranch, deleteBranch } = useBranches();
 
-  // departments for dropdown in modal
-  const [departments, setDepartments] = useState([]);
-
-  useEffect(() => {
-    const loadDepartments = async () => {
-      try {
-        const res = await departmentAPI.getAll();
-        setDepartments(res.data); // expect array of { id, name }
-      } catch (err) {
-        console.error('Failed to load departments', err);
-      }
-    };
-    loadDepartments();
-  }, []);
-
-  const handleAddDesignation = async (values) => {
+  // handle form submit (called from SharedModal)
+  const handleAddBranch = async (values) => {
     try {
-      // values: { name: '...', department: <id> }
-      const payload = {
-        name: values.name,
-        department: values.department,
-      };
-
-      if (editingDesignation) {
-        await updateDesignation(editingDesignation.id, payload);
-        message.success('Designation updated successfully');
+      const payload = { name: values.name };
+      if (editingBranch) {
+        // update flow
+        await updateBranch(editingBranch.id, payload);
+        message.success('Branch updated successfully');
       } else {
-        await addDesignation(payload);
-        message.success('Designation added successfully');
+        // create flow
+        await addBranch(payload);
+        message.success('Branch added successfully');
       }
-
       refetch();
-      setEditingDesignation(null);
+      setEditingBranch(null);
       setIsModalOpen(false);
     } catch (err) {
       message.error(err.response?.data?.message || 'Operation failed');
@@ -72,18 +53,12 @@ const Designation = () => {
       key: 'sl',
       width: 80,
       align: 'center',
-      render: (_, __, index) => index + 1,
+      render: (_, __, index) => index + 1, // auto index
     },
     {
-      title: 'Designation Name',
+      title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      align: 'left',
-    },
-    {
-      title: 'Department',
-      dataIndex: 'department_name',
-      key: 'department',
       align: 'left',
     },
     {
@@ -112,50 +87,38 @@ const Designation = () => {
   ];
 
   const handleEdit = (record) => {
-    // normalize department to id if backend gave object
-    const deptId =
-      record.department !== undefined
-        ? typeof record.department === 'object'
-          ? record.department.id
-          : record.department
-        : record.department_id ?? null;
-
-    setEditingDesignation({
-      id: record.id ?? record.key,
-      name: record.name,
-      department: deptId,
-    });
+    setEditingBranch({ id: record.id ?? record.key, name: record.name });
     setIsModalOpen(true);
   };
 
   const handleDelete = (record) => {
-    console.log('Delete clicked for:', record);
-    setSelectedDesignation(record);
+    console.log("Delete clicked for:", record);
+    setSelectedBranch(record);
     setIsConfirmOpen(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedDesignation) return;
+    if (!selectedBranch) return;
     try {
-      await deleteDesignation(selectedDesignation.id);
-      message.success(`Deleted: ${selectedDesignation.name}`);
+      await deleteBranch(selectedBranch.id);
+      message.success(`Deleted: ${selectedBranch.name}`);
       refetch();
     } catch (error) {
-      message.error('Failed to delete designation');
+      message.error('Failed to delete branch');
       console.error(error);
     } finally {
       setIsConfirmOpen(false);
-      setSelectedDesignation(null);
+      setSelectedBranch(null);
     }
   };
 
   const handleCancelDelete = () => {
     setIsConfirmOpen(false);
-    setSelectedDesignation(null);
+    setSelectedBranch(null);
   };
 
   const handleAddNew = () => {
-    setEditingDesignation(null);
+    setEditingBranch(null);
     setIsModalOpen(true);
   };
 
@@ -177,14 +140,14 @@ const Designation = () => {
   return (
     <div style={{ padding: '24px' }}>
       <Card
-        title="Designation List"
+        title="Branch List"
         extra={
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleAddNew}
           >
-            Add New Designation
+            Add New Branch
           </Button>
         }
       >
@@ -205,7 +168,7 @@ const Designation = () => {
           </Col>
           <Col>
             <Input.Search
-              placeholder="Search designation..."
+              placeholder="Search branch..."
               allowClear
               onChange={(e) => handleSearch(e.target.value)}
               style={{ width: 250 }}
@@ -215,50 +178,33 @@ const Designation = () => {
 
         <Table
           columns={columns}
-          dataSource={designations
-            .filter((d) => {
-              const deptName = (d.department?.name ?? d.department_name ?? '') + '';
-              const searchable = (d.name + ' ' + deptName).toLowerCase();
-              return searchable.includes(searchText);
-            })
+          dataSource={branches
+            .filter((d) => d.name.toLowerCase().includes(searchText))
             .map((d, i) => ({
-              key: d.id ?? i,
+              key: d.id || i,
               id: d.id,
               sl: i + 1,
               name: d.name,
-              department:
-                typeof d.department === 'object' && d.department !== null
-                  ? d.department.id
-                  : d.department,
-              department_name:
-                typeof d.department === 'object' && d.department !== null
-                  ? d.department.name
-                  : d.department_name ?? '',
             }))}
           loading={loading}
           pagination={pagination}
           size="middle"
           bordered
-          scroll={{ x: 600 }}
+          scroll={{ x: 400 }}
         />
       </Card>
-
       {isModalOpen && (
-        <DesignationModal
+        <SharedModal
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
-          onSubmit={handleAddDesignation}
-          editingDesignation={editingDesignation}
-          title={editingDesignation ? 'Edit Designation' : 'Add Designation'}
-          fieldLabel="Designation Name"
-          departments={departments}
+          onSubmit={handleAddBranch}
+          editingDept={editingBranch}
         />
       )}
-
       <ConfirmModal
         isOpen={isConfirmOpen}
-        title="Delete Designation"
-        message={`Are you sure you want to delete "${selectedDesignation?.name}"?`}
+        title="Delete Branch"
+        message={`Are you sure you want to delete "${selectedBranch?.name}"?`}
         onOk={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />
@@ -266,4 +212,4 @@ const Designation = () => {
   );
 };
 
-export default Designation;
+export default Branch;
