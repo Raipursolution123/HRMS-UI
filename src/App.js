@@ -19,6 +19,7 @@ import LeaveType from './pages/leaveManagement/LeaveType';
 import PublicHoliday from './pages/leaveManagement/PublicHoliday';
 import EarnLeaveConfigure from './pages/leaveManagement/EarnLeaveConfigure';
 import WeeklyHoliday from './pages/leaveManagement/WeeklyHoliday';
+import Award from './pages/Award';
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
                 <Route path='earn-leave-configure' element={<EarnLeaveConfigure/>}/>
               </Route>
              </Route>
+             <Route path='award' element={<Award/>}/>
           </Route>
         </Routes>
       </Router>
