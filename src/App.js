@@ -14,6 +14,8 @@ import Termination from './pages/Termination';
 import Promotion from './pages/Promotion';
 import EmployeePermanent from './pages/EmployeePermanent';
 import Warning from './pages/Warning';
+import AddEmployeeForm from './pages/AddEmployee';
+import Profile from './pages/employeeDetails';
 
 function App() {
   return (
@@ -32,19 +34,23 @@ function App() {
               <Layout />
             </ProtectedRoute>
           }>
-             <Route index element={<Dashboard />} />
-             <Route path='employee-management'>
-              <Route path='department' element={<Department/>}/>
-              <Route path='designation' element={<Designation/>}/>
-              <Route path='branch' element={<Branch/>}/>
-              <Route path='manage-employee' element={<ManageEmployee/>}/>
-              <Route path='termination' element={<Termination/>}/>
-              <Route path='promotion' element={<Promotion/>}/>
-              <Route path='employee-permanent' element={<EmployeePermanent/>}/>
-              <Route path='warning' element={<Warning/>}/>
-              
+            <Route index element={<Dashboard />} />
+            <Route path='employee-management'>
+              <Route path='department' element={<Department />} />
+              <Route path='designation' element={<Designation />} />
+              <Route path='branch' element={<Branch />} />
+              <Route path='manage-employee'>
+                <Route index element={<ManageEmployee />} />
+                <Route path='create' element={<AddEmployeeForm />} />
+                <Route path='edit/:id' element={<AddEmployeeForm />} />
+                <Route path='profile/:id' element={<Profile />} />
+              </Route>              <Route path='termination' element={<Termination />} />
+              <Route path='promotion' element={<Promotion />} />
+              <Route path='employee-permanent' element={<EmployeePermanent />} />
+              <Route path='warning' element={<Warning />} />
 
-             </Route>
+
+            </Route>
           </Route>
         </Routes>
       </Router>
