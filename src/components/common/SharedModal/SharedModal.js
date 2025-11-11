@@ -115,13 +115,13 @@ import React, { useEffect } from 'react';
 import { Modal, Form, Input, Button, Card } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 
-const AddDepartmentModal = ({
+const CommonFormModal = ({
   isModalOpen,
   setIsModalOpen,
   onSubmit,
   editingDept,
   title = 'Add Department',
-  fieldLabel = 'Department Name',
+  fieldLabel = [],
 }) => {
   const [form] = Form.useForm();
 
@@ -134,9 +134,11 @@ const AddDepartmentModal = ({
   }, [editingDept, form]);
 
   const handleSubmit = (values) => {
+    console.log(values,'valuesvalues');
+    
     onSubmit(values);
     form.resetFields();
-    setIsModalOpen(false);
+    // setIsModalOpen(false);
   };
 
   const handleCancel = () => {
@@ -168,20 +170,25 @@ const AddDepartmentModal = ({
           onFinish={handleSubmit}
           autoComplete="off"
         >
-          <Form.Item
-            label={fieldLabel}
-            name="name"
+          {Array.isArray(fieldLabel) &&
+          fieldLabel?.map((field) =>(
+             <Form.Item
+            label={field.label}
+            name={field.name}
             rules={[
-              { required: true, message: `Please enter ${fieldLabel.toLowerCase()}!` },
-              { min: 2, message: `${fieldLabel} must be at least 2 characters!` },
+              { required: field.isRequired, message: `Please enter ${field.label.toLowerCase()}!` },
+              { min: 2, message: `${field} must be at least 2 characters!` },
             ]}
           >
-            <Input
-              placeholder={`Enter ${fieldLabel.toLowerCase()}`}
+            {/* <Input
+              placeholder={`Enter ${field.toLowerCase()}`}
               size="large"
               style={{ borderRadius: '6px' }}
-            />
+            /> */}
+            {field.component}
           </Form.Item>
+          ))
+          }
 
           <Form.Item style={{ marginBottom: 0, marginTop: '32px' }}>
             <div
@@ -222,4 +229,4 @@ const AddDepartmentModal = ({
   );
 };
 
-export default AddDepartmentModal;
+export default CommonFormModal;
