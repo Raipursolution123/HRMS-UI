@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Form, Input, Select, DatePicker, Button, Card, Row, Col, Checkbox, Divider, Radio, Upload, Space, Collapse } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined, LockOutlined, UploadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useManageEmployee } from '../hooks/useManageEmployee';
+import { useDepartments } from '../hooks/useDepartments';
+import { useDesignations } from '../hooks/useDesignations';
+import { useBranches } from '../hooks/useBranches';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -9,7 +12,11 @@ const { TextArea } = Input;
 const AddEmployeeForm = () => {
     const [form] = Form.useForm();
     const {addEmployee} = useManageEmployee();
-
+    // const {} = 
+    const {departments} = useDepartments();
+    const {designations} = useDesignations();
+    const {branches} = useBranches();
+console.log(designations,'departments')
     const onFinish = (values) => {
         console.log('Form values:', values);
         addEmployee(values)
@@ -76,7 +83,7 @@ const AddEmployeeForm = () => {
                                 <Col xs={24} sm={6}>
                                     <Form.Item
                                         label="Confirm Password"
-                                        // name="confirmPassword"
+                                        name="confirmPassword"
                                         dependencies={['password']}
                                         rules={[
                                             { required: true, message: 'Please confirm password' },
@@ -145,10 +152,9 @@ const AddEmployeeForm = () => {
                                         rules={[{ required: true, message: 'Please select department' }]}
                                     >
                                         <Select placeholder="--- Please Select ---">
-                                            <Option value="engineering">Engineering</Option>
-                                            <Option value="hr">Human Resource</Option>
-                                            <Option value="finance">Finance</Option>
-                                            <Option value="marketing">Marketing</Option>
+                                            {Array.isArray(departments) && departments?.map((department) =>(
+                                                <Option value={department?.name} key={department?.id}>{department?.name}</Option>                                            ))}
+                    
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -159,10 +165,10 @@ const AddEmployeeForm = () => {
                                         rules={[{ required: true, message: 'Please select designation' }]}
                                     >
                                         <Select placeholder="--- Please Select ---">
-                                            <Option value="software_engineer">Software Engineer</Option>
-                                            <Option value="senior_engineer">Senior Engineer</Option>
-                                            <Option value="team_lead">Team Lead</Option>
-                                            <Option value="manager">Manager</Option>
+                                            {Array.isArray(designations) && designations.map((designation) =>(
+                                                <Option value={designation?.name} key={designation?.id}>{designation?.name}</Option>
+                                            ))}
+            
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -172,9 +178,13 @@ const AddEmployeeForm = () => {
                                         name="branch"
                                     >
                                         <Select placeholder="--- Please Select ---">
-                                            <Option value="main_branch">Main Branch</Option>
-                                            <Option value="branch_2">Branch 2</Option>
-                                            <Option value="branch_3">Branch 3</Option>
+                                            {
+                                                Array.isArray(branches)
+                                                && branches?.map((branch) =>(
+                                                    <Option value={branch?.name} key={branch?.id}>{branch?.name}</Option>
+                                                ))
+                                            }
+        
                                         </Select>
                                     </Form.Item>
                                 </Col>
