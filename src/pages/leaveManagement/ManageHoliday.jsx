@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Table, Button, Space, Card, Row, Col, Select, message, Input } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import SharedModal from '../../components/common/SharedModal/SharedModal';
+import SharedModal from '../../components/common/SharedModal/ManageHolidayModal';
 import ConfirmModal from '../../components/common/SharedModal/ConfirmModal';
 import { useManageHoliday } from '../../hooks/useManageHoliday';
 

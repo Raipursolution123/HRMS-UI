@@ -22,6 +22,10 @@ import PublicHoliday from './pages/leaveManagement/PublicHoliday';
 import EarnLeaveConfigure from './pages/leaveManagement/EarnLeaveConfigure';
 import WeeklyHoliday from './pages/leaveManagement/WeeklyHoliday';
 import Award from './pages/Award';
+import Notice from './pages/Notice';
+import TrainingType from './pages/Training/TrainingType';
+import TrainingList from './pages/Training/TrainingList';
+import TrainingReport from './pages/Training/TrainingReport';
 
 function App() {
   return (
@@ -66,7 +70,13 @@ function App() {
                 <Route path='earn-leave-configure' element={<EarnLeaveConfigure/>}/>
               </Route>
              </Route>
+
+             <Route path='training-type' element={<TrainingType/>}/>
+             <Route path='training-list' element={<TrainingList/>}/>
+             <Route path='training-report' element={<TrainingReport/>}/>
+
              <Route path='award' element={<Award/>}/>
+             <Route path='notice' element={<Notice/>}/>
              </Route>
             
           {/* </Route> */}

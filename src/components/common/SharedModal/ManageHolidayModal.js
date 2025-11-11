@@ -7,8 +7,8 @@ const AddDepartmentModal = ({
   setIsModalOpen,
   onSubmit,
   editingDept,
-  title = 'Add Department',
-  fieldLabel = 'Department Name',
+  title = 'Add Holiday',
+  fieldLabel = 'Holiday Name',
 }) => {
   const [form] = Form.useForm();
 
