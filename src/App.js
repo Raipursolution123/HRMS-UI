@@ -26,6 +26,8 @@ import Notice from './pages/Notice';
 import TrainingType from './pages/Training/TrainingType';
 import TrainingList from './pages/Training/TrainingList';
 import TrainingReport from './pages/Training/TrainingReport';
+import ManageWorkShift from './pages/Attendance/ManageWorkShift';
+import MonthlyPayGrade from './pages/Payroll/MonthlyPayGrade';
 
 function App() {
   return (
@@ -69,6 +71,15 @@ function App() {
                 <Route path='leave-type' element={<LeaveType/>}/>
                 <Route path='earn-leave-configure' element={<EarnLeaveConfigure/>}/>
               </Route>
+             </Route>
+             <Route path='attendance'>
+               <Route path='setup'>
+                  <Route path='manage-work-shift' element={<ManageWorkShift/>}/>
+                </Route>
+             </Route>
+
+             <Route path='payroll'>
+              <Route path='monthly-pay-grade' element={<MonthlyPayGrade/>}/>
              </Route>
 
              <Route path='training-type' element={<TrainingType/>}/>
