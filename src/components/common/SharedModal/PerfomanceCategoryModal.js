@@ -16,7 +16,7 @@ const PerformanceCategoryModal = ({ isModalOpen, setIsModalOpen, onSubmit, editi
   }, [editingCategory, form]);
 
   const handleFinish = (values) => {
-    
+
     onSubmit(values);
     form.resetFields();
     setIsModalOpen(false);
@@ -40,7 +40,7 @@ const PerformanceCategoryModal = ({ isModalOpen, setIsModalOpen, onSubmit, editi
         <Form form={form} layout="vertical" onFinish={handleFinish} autoComplete="off">
           <Form.Item
             label="Performance Category"
-            name="name"
+            name="category_name"
             rules={[{ required: true, message: 'Please enter performance category!' }]}
           >
             <Input placeholder="Enter performance category" size="large" />

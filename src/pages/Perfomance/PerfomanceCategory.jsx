@@ -75,8 +75,8 @@ const PerformanceCategory = () => {
     },
     {
       title: 'Performance Category',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'category_name',
+      key: 'category_name',
       align: 'left',
     },
     {
