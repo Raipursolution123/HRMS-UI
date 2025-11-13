@@ -57,9 +57,20 @@ const PublicHoliday = () => {
       message.error(err.response?.data?.message || 'Operation failed');
     }
   };
+  const loadDepartments = async (page = currentPage, size = pageSize, search = searchText) => {
+    const data = await refetch(page, size, search);
+    if (data && data.count !== undefined) setTotal(data.count);
+  };
+  const [total, setTotal] = useState(0);
+  
+  // Fetch when page, size, or search changes
+  useEffect(() => {
+    loadDepartments(currentPage, pageSize, searchText);
+  }, [currentPage, pageSize, searchText]);
 
   const handleSearch = (value) => {
     setSearchText(value.toLowerCase());
+    setCurrentPage(1); // reset to page 1
   };
 
   const handleEdit = (record) => {
@@ -112,7 +123,7 @@ const PublicHoliday = () => {
   const pagination = {
     current: currentPage,
     pageSize: pageSize,
-    total: publicHolidays.length,
+    total: total,
     showSizeChanger: true,
     showQuickJumper: true,
     showTotal: (total, range) =>

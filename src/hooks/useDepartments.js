@@ -12,7 +12,7 @@ export const useDepartments = () => {
     try {
       setLoading(true);
       setError(null);
-       const response = await departmentAPI.getAll({
+      const response = await departmentAPI.getAll({
       page,
       page_size: pageSize,
       search,

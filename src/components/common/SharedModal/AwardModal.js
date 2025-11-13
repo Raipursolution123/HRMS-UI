@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import { Modal, Form, Select, Input, DatePicker, Button, Card } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useEmployees } from '../../../hooks/useAward';
 
-const AwardModal = ({ isModalOpen, setIsModalOpen, onSubmit, editingAward, employees = [] }) => {
+const AwardModal = ({ isModalOpen, setIsModalOpen, onSubmit, editingAward, employees= [] }) => {
   const [form] = Form.useForm();
+  const { employ = [] } = useEmployees() || {};
 
   // backend expects predefined choices — so keep the same
   const awardOptions = [
@@ -92,7 +94,7 @@ const AwardModal = ({ isModalOpen, setIsModalOpen, onSubmit, editingAward, emplo
             <Select
               placeholder="Select employee"
               size="large"
-              options={employees.map((emp) => ({
+              options={employ.map((emp) => ({
                 label: emp.name,
                 value: emp.id,
               }))}
@@ -143,3 +145,4 @@ const AwardModal = ({ isModalOpen, setIsModalOpen, onSubmit, editingAward, emplo
 };
 
 export default AwardModal;
+

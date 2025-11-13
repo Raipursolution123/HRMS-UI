@@ -6,11 +6,15 @@ export const usePublicHoliday = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchPublicHolidays = async () => {
+  const fetchPublicHolidays = async (page = 1, pageSize = 10, search = '') => {
     try {
       setLoading(true);
       setError(null);
-      const response = await publicHolidayAPI.getAll();
+      const response = await publicHolidayAPI.getAllPage({
+            page,
+            page_size: pageSize,
+            search,
+          });
       console.log("Public Holidays API response:", response.data);
 
       setPublicHolidays(response.data.results);

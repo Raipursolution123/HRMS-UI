@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Card, Row, Col, Select, message, Input } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import LeaveTypeModal from '../../components/common/SharedModal/LeaveTypeModal';
@@ -71,9 +71,20 @@ const LeaveType = () => {
     setEditingLeaveType(null);
     setIsModalOpen(true);
   };
+  const loadLeaveType = async (page = currentPage, size = pageSize, search = searchText) => {
+    const data = await refetch(page, size, search);
+    if (data && data.count !== undefined) setTotal(data.count);
+  };
+  const [total, setTotal] = useState(0);
+  
+  // Fetch when page, size, or search changes
+  useEffect(() => {
+    loadLeaveType(currentPage, pageSize, searchText);
+  }, [currentPage, pageSize, searchText]);
 
   const handleSearch = (value) => {
     setSearchText(value.toLowerCase());
+    setCurrentPage(1); // reset to page 1
   };
 
   const columns = [

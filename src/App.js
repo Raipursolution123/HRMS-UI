@@ -32,6 +32,10 @@ import PerfomanceCategory from './pages/Perfomance/PerfomanceCategory';
 import PerfomanceCriteria from './pages/Perfomance/PerfomanceCriteria';
 import EmployeePerfomance from './pages/Perfomance/EmployeePerfomance';
 import SummaryReport from './pages/Perfomance/SummaryReport';
+import ApplyForLeave from './pages/leaveManagement/ApplyForLeave';
+import RequestedApplication from './pages/leaveManagement/RequestedApplication';
+import LeaveReport from './pages/leaveManagement/LeaveReport';
+import MyLeaveReport from './pages/leaveManagement/MyLeaveReport';
 
 function App() {
   return (
@@ -75,6 +79,16 @@ function App() {
                 <Route path='leave-type' element={<LeaveType/>}/>
                 <Route path='earn-leave-configure' element={<EarnLeaveConfigure/>}/>
               </Route>
+              <Route path='leave-application'>
+                <Route path='apply-for-leave' element={<ApplyForLeave/>} />
+                <Route path='requested-application' element={<RequestedApplication/>} />
+              </Route>
+              <Route path='report'>
+                <Route path='leave-report' element={<LeaveReport/>} />
+                <Route path='summary-report' element={<SummaryReport/>} />
+                <Route path='my-leave-report' element={<MyLeaveReport/>} />
+              </Route>
+
              </Route>
              <Route path='attendance'>
                <Route path='setup'>

@@ -1,0 +1,137 @@
+import React, { useEffect, useState } from "react";
+import { Table, Card, Tag, Button, Space, Spin } from "antd";
+import { getAllLeaveRequests } from "../../services/requestedApplicationsServices";
+
+const RequestedApplication = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+
+  const fetchLeaveRequests = async (page = 1, pageSize = 10) => {
+    try {
+      setLoading(true);
+      const res = await getAllLeaveRequests({
+        page,
+        page_size: pageSize,
+      });
+
+      setData(res.results || res || []);
+      setPagination({
+        current: page,
+        pageSize,
+        total: res.count || res.length || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching leave requests:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLeaveRequests();
+  }, []);
+
+  // Table columns
+  const columns = [
+    {
+      title: "S/L",
+      key: "serial",
+      render: (_, __, index) =>
+        (pagination.current - 1) * pagination.pageSize + index + 1,
+      width: 70,
+      align: "center",
+    },
+    {
+      title: "Employee Name",
+      dataIndex: "employee_name",
+      key: "employee_name",
+      align: "center",
+    },
+    {
+      title: "Leave Type",
+      dataIndex: "leave_type_name",
+      key: "leave_type_name",
+      align: "center",
+    },
+    {
+      title: "Request Duration",
+      key: "request_duration",
+      render: (record) => `${record.start_date} to ${record.end_date}`,
+      align: "center",
+    },
+    {
+      title: "Request Date",
+      dataIndex: "request_date",
+      key: "request_date",
+      align: "center",
+    },
+    {
+      title: "Number of Days",
+      dataIndex: "number_of_days",
+      key: "number_of_days",
+      align: "center",
+    },
+    {
+      title: "Purpose",
+      dataIndex: "purpose",
+      key: "purpose",
+      align: "center",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      align: "center",
+      render: (status) => {
+        let color = "blue";
+        if (status === "Approved") color = "green";
+        else if (status === "Rejected") color = "red";
+        else if (status === "Pending") color = "gold";
+        return <Tag color={color}>{status}</Tag>;
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      align: "center",
+      render: () => (
+        <Space>
+          <Button type="primary" size="small">
+            View
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <Card title="Requested Application" bordered={false}>
+      {loading ? (
+        <div className="flex justify-center items-center py-10">
+          <Spin size="large" />
+        </div>
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={data}
+          rowKey={(record) => record.id || record.pk}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            onChange: (page, pageSize) => fetchLeaveRequests(page, pageSize),
+          }}
+          bordered
+        />
+      )}
+    </Card>
+  );
+};
+
+export default RequestedApplication;

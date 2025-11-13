@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { awardAPI } from '../services/awardServices';
+import  {manageEmployeeApi}  from '../services/manageEmployeeServices';
 
 export const useAwards = () => {
   const [awards, setAwards] = useState([]);
@@ -71,5 +72,33 @@ export const useAwards = () => {
     updateAward,
     deleteAward,
   };
+};
+export const useEmployees = () => {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchEmployees = async () => {
+    try {
+      setLoading(true);
+      const res = await manageEmployeeApi.getAll();
+      if (Array.isArray(res?.data?.results)) {
+        setEmployees(res.data.results);
+      } else if (Array.isArray(res?.data)) {
+        setEmployees(res.data);
+      } else if (Array.isArray(res)) {
+        setEmployees(res);
+      }
+    } catch (err) {
+      console.error('Failed to fetch employees:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  return { employees, loading, refetch: fetchEmployees };
 };
 

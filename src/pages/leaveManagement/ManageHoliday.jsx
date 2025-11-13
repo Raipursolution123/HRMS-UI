@@ -1,5 +1,5 @@
-// src/pages/ManageHoliday.jsx
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Card, Row, Col, Select, message, Input } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import SharedModal from '../../components/common/SharedModal/ManageHolidayModal';
@@ -45,8 +45,20 @@ const ManageHoliday = () => {
     }
   };
 
+  const loadManagEmployee = async (page = currentPage, size = pageSize, search = searchText) => {
+    const data = await refetch(page, size, search);
+    if (data && data.count !== undefined) setTotal(data.count);
+  };
+  const [total, setTotal] = useState(0);
+  
+  // Fetch when page, size, or search changes
+  useEffect(() => {
+    loadManagEmployee(currentPage, pageSize, searchText);
+  }, [currentPage, pageSize, searchText]);
+
   const handleSearch = (value) => {
     setSearchText(value.toLowerCase());
+    setCurrentPage(1); // reset to page 1
   };
 
   const handleEdit = (record) => {
@@ -86,7 +98,7 @@ const ManageHoliday = () => {
   const pagination = {
     current: currentPage,
     pageSize: pageSize,
-    total: manageHoliday.length,
+    total: total,
     showSizeChanger: true,
     showQuickJumper: true,
     showTotal: (total, range) =>

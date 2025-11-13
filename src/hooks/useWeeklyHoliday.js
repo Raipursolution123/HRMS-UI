@@ -6,11 +6,15 @@ export const useWeeklyHoliday = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchWeeklyHolidays = async () => {
+  const fetchWeeklyHolidays = async (page = 1, pageSize = 10, search = '') => {
     try {
       setLoading(true);
       setError(null);
-      const response = await weeklyHolidayAPI.getAll();
+      const response = await weeklyHolidayAPI.getAllPage({
+            page,
+            page_size: pageSize,
+            search,
+          });
       // Expect response.data to be array of objects like { id, day, status, ... }
       setWeeklyHolidays(response.data.results);
     } catch (err) {

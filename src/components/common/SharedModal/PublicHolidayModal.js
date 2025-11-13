@@ -99,11 +99,19 @@ const PublicHolidayModal = ({
               size="large"
               style={{ borderRadius: '6px' }}
             >
-              {holidaysOptions.map((h) => (
-                <Option key={h.id} value={h.id}>
-                  {h.name}
-                </Option>
-              ))}
+              {Array.isArray(holidaysOptions)
+                ? holidaysOptions.map((h) => (
+                  <Option key={h.id} value={h.id}>
+                   {h.name}
+                  </Option>
+                  ))
+                  : Array.isArray(holidaysOptions?.results)
+                   ? holidaysOptions.results.map((h) => (
+                  <Option key={h.id} value={h.id}>
+                   {h.name}
+                  </Option>
+                    ))
+                  : null}
             </Select>
           </Form.Item>
 

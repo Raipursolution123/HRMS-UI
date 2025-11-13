@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Card, Row, Col, Select, message, Input } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import WeeklyHolidayModal from '../../components/common/SharedModal/WeeklyHolidayModal';
@@ -34,9 +34,20 @@ const WeeklyHoliday = () => {
       message.error(err.response?.data?.message || 'Operation failed');
     }
   };
+  const loadWeeklyHoliday = async (page = currentPage, size = pageSize, search = searchText) => {
+    const data = await refetch(page, size, search);
+    if (data && data.count !== undefined) setTotal(data.count);
+  };
+  const [total, setTotal] = useState(0);
+  
+  // Fetch when page, size, or search changes
+  useEffect(() => {
+    loadWeeklyHoliday(currentPage, pageSize, searchText);
+  }, [currentPage, pageSize, searchText]);
 
   const handleSearch = (value) => {
     setSearchText(value.toLowerCase());
+    setCurrentPage(1);
   };
 
   const columns = [
@@ -127,7 +138,7 @@ const WeeklyHoliday = () => {
   const pagination = {
     current: currentPage,
     pageSize: pageSize,
-    total: weeklyHolidays.length,
+    total: total,
     showSizeChanger: true,
     showQuickJumper: true,
     showTotal: (total, range) =>
