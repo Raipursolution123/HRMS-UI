@@ -40,10 +40,12 @@ export const useDepartments = () => {
   };
 
   // Update department (PUT/PATCH)
-  const updateDepartment = async (id, data) => {
+  const updateDepartment = async (id, data,Toast) => {
+          setLoading(true);
+
     try {
-      setLoading(true);
-      await departmentAPI.update(id, data); // PUT /company/departments/<id>/
+      await departmentAPI.update(id, data);
+      Toast.success("Department Updated Successfully")
       await fetchDepartments();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update department');

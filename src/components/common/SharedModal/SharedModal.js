@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Button, Card } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
+import { useDepartments } from '../../../hooks/useDepartments';
 
 const CommonFormModal = ({
   isModalOpen,
@@ -11,6 +12,7 @@ const CommonFormModal = ({
   fieldLabel = [],
 }) => {
   const [form] = Form.useForm();
+  const {loading} = useDepartments();
 
   useEffect(() => {
     if (editingDept) {
@@ -20,18 +22,16 @@ const CommonFormModal = ({
     }
   }, [editingDept, form]);
 
-  const handleSubmit = (values) => {
-    console.log(values,'valuesvalues');
-    
+  const handleSubmit = (values) => {    
     onSubmit(values);
     form.resetFields();
-    // setIsModalOpen(false);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
     form.resetFields();
   };
+console.log(loading,'loading');
 
   return (
     <Modal
@@ -96,6 +96,7 @@ const CommonFormModal = ({
                 Cancel
               </Button>
               <Button
+                loading={loading}
                 type="primary"
                 htmlType="submit"
                 icon={<SaveOutlined />}

@@ -4,6 +4,7 @@ import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import SharedModal from '../components/common/SharedModal/SharedModal';
 import { useDepartments } from '../hooks/useDepartments';
 import ConfirmModal from '../components/common/SharedModal/ConfirmModal';
+import { useToast } from '../hooks/useToast';
 const { Option } = Select;
 
 
@@ -11,56 +12,46 @@ const Department = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { Toast, contextHolder } = useToast();
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedDept, setSelectedDept] = useState(null);
 
-    // added editingDept state
+  // added editingDept state
   const [editingDept, setEditingDept] = useState(null);
 
   const [searchText, setSearchText] = useState('');
 
-  
 
-  const { departments, loading, error, refetch, addDepartment, updateDepartment, deleteDepartment} = useDepartments();
 
-  
-  const handleAddDepartment = async (values) => {
-    try {
-      const payload = {name: values.name };
-      if (editingDept) {
-        // update flow
-        await updateDepartment(editingDept.id, payload);
-        message.success('Department updated successfully');
-      } 
-      
-      else {
-        // create flow
-        await addDepartment(payload);
-        message.success('Department added successfully');
-      }
-      refetch()
-      setEditingDept(null);
-      setIsModalOpen(false);
-    } catch (err) {
-       message.error(err.response?.data?.message || 'Operation failed');
+  const { departments, loading, error, refetch, addDepartment, updateDepartment, deleteDepartment } = useDepartments();
+
+
+  const handleAddDepartment = (values) => {
+    console.log(values, 'values');
+    if (editingDept) {
+      updateDepartment(editingDept.id, values, Toast);
     }
+    else {
+      addDepartment(values);
+    }
+    setEditingDept(null);
   };
 
   const loadDepartments = async (page = currentPage, size = pageSize, search = searchText) => {
-  const data = await refetch(page, size, search);
-  if (data && data.count !== undefined) setTotal(data.count);
-};
-const [total, setTotal] = useState(0);
+    const data = await refetch(page, size, search);
+    if (data && data.count !== undefined) setTotal(data.count);
+  };
+  const [total, setTotal] = useState(0);
 
-// Fetch when page, size, or search changes
-useEffect(() => {
-  loadDepartments(currentPage, pageSize, searchText);
-}, [currentPage, pageSize, searchText]);
+  // Fetch when page, size, or search changes
+  useEffect(() => {
+    loadDepartments(currentPage, pageSize, searchText);
+  }, [currentPage, pageSize, searchText]);
 
   const handleSearch = (value) => {
-  setSearchText(value.toLowerCase());
-  setCurrentPage(1); // reset to page 1
+    setSearchText(value.toLowerCase());
+    setCurrentPage(1); // reset to page 1
   };
 
 
@@ -87,16 +78,16 @@ useEffect(() => {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Button 
-            type="primary" 
-            icon={<EditOutlined />} 
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
             size="small"
             onClick={() => handleEdit(record)}
           />
-          <Button 
-            type="primary" 
-            danger 
-            icon={<DeleteOutlined />} 
+          <Button
+            type="primary"
+            danger
+            icon={<DeleteOutlined />}
             size="small"
             onClick={() => handleDelete(record)}
           />
@@ -117,24 +108,24 @@ useEffect(() => {
     setIsConfirmOpen(true)
   };
   const handleConfirmDelete = async () => {
-  if (!selectedDept) return;
-  try {
-    await deleteDepartment(selectedDept.id);
-    message.success(`Deleted: ${selectedDept.name}`);
-    refetch();
-  } catch (error) {
-    message.error('Failed to delete department');
-    console.error(error);
-  } finally {
+    if (!selectedDept) return;
+    try {
+      await deleteDepartment(selectedDept.id);
+      message.success(`Deleted: ${selectedDept.name}`);
+      refetch();
+    } catch (error) {
+      message.error('Failed to delete department');
+      console.error(error);
+    } finally {
+      setIsConfirmOpen(false);
+      setSelectedDept(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
     setIsConfirmOpen(false);
     setSelectedDept(null);
-  }
- };
-
- const handleCancelDelete = () => {
-  setIsConfirmOpen(false);
-  setSelectedDept(null);
- };
+  };
 
 
   const handleAddNew = () => {
@@ -143,26 +134,27 @@ useEffect(() => {
   };
 
   const pagination = {
-  current: currentPage,
-  pageSize: pageSize,
-  total: total,
-  showSizeChanger: true,
-  showQuickJumper: true,
-  showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-  pageSizeOptions: ['10', '20', '50', '100'],
-  onChange: (page, size) => {
-    setCurrentPage(page);
-    setPageSize(size);
-  },
+    current: currentPage,
+    pageSize: pageSize,
+    total: total,
+    showSizeChanger: true,
+    showQuickJumper: true,
+    showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+    pageSizeOptions: ['10', '20', '50', '100'],
+    onChange: (page, size) => {
+      setCurrentPage(page);
+      setPageSize(size);
+    },
   };
 
   return (
     <div style={{ padding: '24px' }}>
-      <Card 
-        title="Department List" 
+      {contextHolder}
+      <Card
+        title="Department List"
         extra={
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             icon={<PlusOutlined />}
             onClick={handleAddNew}
           >
@@ -198,13 +190,13 @@ useEffect(() => {
         <Table
           columns={columns}
           dataSource={departments
-          .filter((d) => d.name.toLowerCase().includes(searchText))
-          .map((d, i) => ({
-          key: d.id || i,
-          id: d.id,
-          sl: i + 1,
-          name: d.name,
-          }))
+            .filter((d) => d.name.toLowerCase().includes(searchText))
+            .map((d, i) => ({
+              key: d.id || i,
+              id: d.id,
+              sl: i + 1,
+              name: d.name,
+            }))
           }
 
           loading={loading}
@@ -214,20 +206,20 @@ useEffect(() => {
           scroll={{ x: 400 }}
         />
       </Card>
-     {isModalOpen && (
+      {isModalOpen && (
         <SharedModal
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
           onSubmit={handleAddDepartment} //  pass the handler
           editingDept={editingDept} // pass for prefill in modal
           fieldLabel={[
-    {
-      label: 'Department Name',
-      name: 'name',
-      isRequired: true,
-      component: <Input placeholder="Enter Department Name" size="large" />,
-    },
-  ]}
+            {
+              label: 'Department Name',
+              name: 'name',
+              isRequired: true,
+              component: <Input placeholder="Enter Department Name" size="large" />,
+            },
+          ]}
         />
       )}
       <ConfirmModal

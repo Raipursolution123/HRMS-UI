@@ -3,20 +3,24 @@ import { authAPI } from '../services/authServices';
 import { departmentAPI } from '../services/departmentServices';
 import { data } from 'react-router-dom';
 import { manageEmployeeApi } from '../services/manageEmployeeServices';
-import {workShiftAPI, WorkShiftAPI} from '../services/manageWorkShiftServices'
+import { workShiftAPI, WorkShiftAPI } from '../services/manageWorkShiftServices'
+
 
 export const useManageEmployee = () => {
-  const [employee, setEmployee] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  let message, description;
+
 
   const fetchEmployee = async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await manageEmployeeApi.getAll();
-      setEmployee(response.data);
+      console.log(response, 'response')
+      setEmployees(response?.data.results);
       setSupervisors(response.data?.results || response.data || []);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch departments');
@@ -25,15 +29,20 @@ export const useManageEmployee = () => {
     }
   };
 
-  const addEmployee = async (employeeData) => {
-    console.log(employeeData,"employeeData"); 
+  const addEmployee = async (employeeData, Toast) => {
     try {
       setLoading(true);
-      await manageEmployeeApi.create(employeeData);
-      await fetchEmployee();
-    }catch (err) {
+      const response = await manageEmployeeApi.create(employeeData);
+      // if (response?.data?.status === 200 || response?.data?.status === 201) {
+        Toast.success('success', 'Employee added successfully')
+        await fetchEmployee();
+      // }
+
+    } catch (err) {
       setError(err.response?.data?.message || 'Failed to add department');
-    }finally {
+        Toast.error('error', 'Failed to add employee')
+
+    } finally {
       setLoading(false);
     }
   };
@@ -73,7 +82,7 @@ export const useManageEmployee = () => {
   }, []);
 
   return {
-    employee,
+    employees,
     loading,
     error,
     addEmployee,
