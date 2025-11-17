@@ -11,7 +11,7 @@ const ManageEmployee = () => {
      const navigate = useNavigate();
      const [isOpenModal,setIsOpenModal] = useState(false)
 
-    const { employee,
+    const { employees,
         loading,
         error,supervisors } = useManageEmployee();
     // Employee data
@@ -47,7 +47,7 @@ const ManageEmployee = () => {
             supervisor: 'jhon hally'
         }
     ];
-
+console.log(employees,'employees')
     // Job status color mapping
     const getStatusColor = (status) => {
         const statusColors = {
@@ -73,16 +73,16 @@ const handleEmptyData = (data) => (data || "--")
     const employeeColumns = [
          {
             title: 'Serial',
-            dataIndex: 'serial',
-            key: 'serial',
-            render : (text,record) =>(
-                <span>{handleEmptyData(record.key)}</span>
-            )
+            dataIndex: 'user_id',
+            key: 'user_id',
+            // render : (text,record) =>(
+            //     <span>{handleEmptyData(record.key)}</span>
+            // )
         },
         {
             title: 'Employee',
             dataIndex: 'name',
-            key: 'employeeInfo',
+            key: 'name',
             render: (text, record) => (
                 <Space>
                     <Avatar
@@ -117,7 +117,7 @@ const handleEmptyData = (data) => (data || "--")
                         </div>
                         {record.supervisor && record.supervisor !== 'N/A' && (
                             <div style={{ color: '#666', fontSize: '12px' }}>
-                                Branch Name: {handleEmptyData(record?.branchName)}
+                                Branch Name: {handleEmptyData(record?.branch)}
                             </div>
                         )}
                 </Space>
@@ -131,18 +131,18 @@ const handleEmptyData = (data) => (data || "--")
         },
         {
             title: 'Fingerprint/Emp No.',
-            dataIndex: 'fingerprintEmpNo',
-            key: 'fingerprintEmpNo',
+            dataIndex: 'employee_id',
+            key: 'employee_id',
         },
         {
             title: 'Pay Grade',
-            dataIndex: 'payGradeName',
-            key: 'payGradeName',
+            dataIndex: 'pay_grade',
+            key: 'pay_grade',
         },
         {
             title: 'Date of Joining',
-            dataIndex: 'dateOfJoining',
-            key: 'dateOfJoining',
+            dataIndex: 'date_of_joining',
+            key: 'date_of_joining',
             render: (text, record) => (
                 <Space direction="vertical">
                     <div>{text}</div>
@@ -150,7 +150,7 @@ const handleEmptyData = (data) => (data || "--")
                         {record.joiningDuration}
                     </div>
                     <div style={{ color: '#666', fontSize: '12px' }}>
-                        Job Status: {handleEmptyData(record.jobStatus)}
+                        Job Status: {handleEmptyData(record.job_status)}
                     </div>
                 </Space>
             ),
@@ -239,7 +239,7 @@ const handleEmptyData = (data) => (data || "--")
         console.log('Refresh employee data');
     };
 const AddEmployeeButton = (
-   <Button type="primary" onClick={() =>( navigate('create'))}>{"Add Employee"}</Button>
+   <Button type="primary" onClick={() =>( navigate('create'))}>+{"Add Employee"}</Button>
 )
 const handleDeleteConfirm = () => {
 
@@ -258,7 +258,7 @@ const deleteModal = {
     return (
         <CommonTable
             title="Employee List"
-            data={employeeData}
+            data={employees}
             columns={employeeColumns}
             showSearch={true}
             showFilters={true}
