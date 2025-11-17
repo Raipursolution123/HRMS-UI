@@ -40,7 +40,7 @@ import JobPost from './pages/Requirement/JobPost';
 import JobCandidate from './pages/Requirement/JobCandidate';
 import LeaveSummaryReport from './pages/leaveManagement/LeaveSummaryReport';
 import DashboardAttendance from './pages/Attendance/DashboardAttendance';
-import MannualAttendance from './pages/Attendance/MannualAttendance';
+import ManualAttendance from './pages/Attendance/ManualAttendance';
 import AttendanceSummaryReport from './pages/Attendance/AttendanceSummaryReport';
 import DailyAttendance from './pages/Attendance/DailyAttendance'; 
 import MonthlyAttendance from './pages/Attendance/MonthlyAttendance';
@@ -110,7 +110,7 @@ function App() {
                   <Route path='my-attendance-report' element={<MyAttendanceReport/>}/>
                   <Route path='summary-report' element={<AttendanceSummaryReport/>}/> 
                 </Route>
-                <Route path='manual-attendance' element={<MannualAttendance/>} />
+                <Route path='manual-attendance' element={<ManualAttendance/>} />
              </Route>
 
              <Route path='payroll'>
