@@ -8,7 +8,7 @@ const DesignationModal = ({
   isModalOpen,
   setIsModalOpen,
   onSubmit,
-  editingDesignation, // { id, name, department } where department is id or {id,name}
+  editingDesignation,
   title = 'Add Designation',
   fieldLabel = 'Designation Name',
   departments = [], // [{id, name}, ...]
@@ -37,7 +37,6 @@ const DesignationModal = ({
   }, [editingDesignation, form]);
 
   const handleSubmit = (values) => {
-    // values: { name: '...', department: <id> }
     onSubmit(values);
     form.resetFields();
     setIsModalOpen(false);

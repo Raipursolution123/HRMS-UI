@@ -4,6 +4,7 @@ import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import CommonFormModal from '../components/common/SharedModal/BranchModal';
 import { useBranches } from '../hooks/useBranches';
 import ConfirmModal from '../components/common/SharedModal/ConfirmModal';
+import{useToast} from'../hooks/useToast';
 const { Option } = Select;
 
 const Branch = () => {
@@ -17,27 +18,30 @@ const Branch = () => {
 
   const { branches, loading, error, refetch, addBranch, updateBranch, deleteBranch } = useBranches();
 
-  // ✅ Fetch branches whenever pagination or search changes
+  const {Toast, contextHolder}=useToast();  
+
   useEffect(() => {
     refetch(currentPage, pageSize, searchText.trim());
   }, [currentPage, pageSize, searchText]);
 
-  // ✅ handle Add/Edit form submit
   const handleAddBranch = async (values) => {
     try {
       const payload = { name: values.name };
       if (editingBranch) {
         await updateBranch(editingBranch.id, payload);
-        message.success('Branch updated successfully');
+        Toast.success('Branch updated successfully');
+       // message.success('Branch updated successfully');
       } else {
         await addBranch(payload);
-        message.success('Branch added successfully');
+        Toast.success('Branch added successfully');
+      //  message.success('Branch added successfully');
       }
       refetch(currentPage, pageSize, searchText.trim());
       setEditingBranch(null);
       setIsModalOpen(false);
     } catch (err) {
-      message.error(err.response?.data?.message || 'Operation failed');
+      Toast.error(err.response?.data?.message || 'Operation failed');
+      //message.error(err.response?.data?.message || 'Operation failed');
     }
   };
 
@@ -101,10 +105,12 @@ const Branch = () => {
     if (!selectedBranch) return;
     try {
       await deleteBranch(selectedBranch.id);
-      message.success(`Deleted: ${selectedBranch.name}`);
+      Toast.success(`Deleted: ${selectedBranch.name}`);
+      //message.success(`Deleted: ${selectedBranch.name}`);
       refetch(currentPage, pageSize, searchText.trim());
     } catch (error) {
-      message.error('Failed to delete branch');
+      Toast.error('Failed to delete branch');
+     // message.error('Failed to delete branch');
     } finally {
       setIsConfirmOpen(false);
       setSelectedBranch(null);
@@ -138,6 +144,7 @@ const Branch = () => {
 
   return (
     <div style={{ padding: '24px' }}>
+      {contextHolder}
       <Card
         title="Branch List"
         extra={

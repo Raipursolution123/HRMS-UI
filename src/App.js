@@ -48,6 +48,7 @@ import MyAttendanceReport from './pages/Attendance/MyAttendanceReport';
 import ChangePassword from './pages/Administration/ChangePassword';
 import AddPermission from './pages/Administration/AddPermission';
 import AddRole from './pages/Administration/AddRole';
+import HourlyPayGrade from './pages/Payroll/HourlyPayGrade';
 
 function App() {
   return (
@@ -125,6 +126,7 @@ function App() {
 
              <Route path='payroll'>
               <Route path='monthly-pay-grade' element={<MonthlyPayGrade/>}/>
+              <Route path='hourly-pay-grade' element={<HourlyPayGrade/>} />
              </Route>
              
               <Route path='performance-category' element={<PerfomanceCategory/>}/>
