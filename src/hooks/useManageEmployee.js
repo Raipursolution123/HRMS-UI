@@ -8,6 +8,7 @@ import { workShiftAPI, WorkShiftAPI } from '../services/manageWorkShiftServices'
 
 export const useManageEmployee = () => {
   const [employees, setEmployees] = useState([]);
+  const [profile,setProfile] = useState({});
   const [supervisors, setSupervisors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -28,12 +29,22 @@ export const useManageEmployee = () => {
       setLoading(false);
     }
   };
-
+const fetchEmployeeById = async(id)=>{
+  setLoading(true);
+  setError(null);
+  try{
+    const response = await manageEmployeeApi.getById(id);
+    setProfile(response?.data)
+  }catch(error){
+          setError(error.response?.data?.message || 'Failed to fetch employee');
+  }finally{
+    setLoading(false);
+  }
+}
   const addEmployee = async (employeeData, Toast) => {
     try {
       setLoading(true);
-      const response = await manageEmployeeApi.create(employeeData);
-      // if (response?.data?.status === 200 || response?.data?.status === 201) {
+       await manageEmployeeApi.create(employeeData);
         Toast.success('success', 'Employee added successfully')
         await fetchEmployee();
       // }
@@ -49,13 +60,17 @@ export const useManageEmployee = () => {
 
 
   // Update department (PUT/PATCH)
-  const updateDepartment = async (id, data) => {
+  const updateEmployee = async (id, data,Toast) => {
     try {
       setLoading(true);
-      await departmentAPI.update(id, data); // PUT /company/departments/<id>/
-      await fetchEmployee();
+      await manageEmployeeApi.update(id, data);
+            Toast.success('success', 'Employee Updated successfully')
+
+      // await fetchEmployee();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update department');
+                  Toast.error('error', 'Something went wrong')
+
       throw err;
     } finally {
       setLoading(false);
@@ -63,13 +78,15 @@ export const useManageEmployee = () => {
   };
 
   // Delete department
-  const deleteDepartment = async (id) => {
+  const deleteEmployee = async (id,Toast) => {
     try {
       setLoading(true);
-      await departmentAPI.delete(id); // DELETE /company/departments/<id>/
-      await fetchEmployee();
+      await manageEmployeeApi.delete(id); 
+      Toast.success('success', 'Employee Deleted successfully')
+      fetchEmployee();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete department');
+            Toast.error('error', 'Something went wrong')
       throw err;
     } finally {
       setLoading(false);
@@ -86,7 +103,11 @@ export const useManageEmployee = () => {
     loading,
     error,
     addEmployee,
-    supervisors
+    supervisors,
+    deleteEmployee,
+    fetchEmployeeById,
+    profile,
+    updateEmployee,
     // refetch: fetchDepartments,
     // addDepartment,
     // updateDepartment,

@@ -5,49 +5,16 @@ import { useManageEmployee } from '../hooks/useManageEmployee';
 import {  useNavigate } from 'react-router-dom';
 import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
+import { useToast } from '../hooks/useToast';
 const { Option } = Select;
 
 const ManageEmployee = () => {
      const navigate = useNavigate();
-     const [isOpenModal,setIsOpenModal] = useState(false)
+     const [isOpenModal,setIsOpenModal] = useState(false);
+     const [deleteId,setDeleteId] = useState();
 
-    const { employees,
-        loading,
-        error,supervisors } = useManageEmployee();
-    // Employee data
-    const employeeData = [
-        {
-            key: '1',
-            name: 'sujit wagh',
-            department: 'Engineering',
-            designation: 'Software Engineer',
-            role: 'Employee',
-            branchName: 'Main Branch',
-            fingerprintEmpNo: '4S',
-            payGradeName: 'CC (Monthly)',
-            dateOfJoining: '06/11/2025',
-            joiningDuration: '2 days ago',
-            jobStatus: 'Probation Period',
-            phone: 'N/A',
-            supervisor: 'N/A'
-        },
-        {
-            key: '2',
-            name: 'John Doe',
-            department: 'Human Resource',
-            designation: 'Director',
-            role: 'Employee',
-            branchName: 'Main Branch',
-            fingerprintEmpNo: '9000',
-            payGradeName: 'Intern (Monthly)',
-            dateOfJoining: '06/10/2025',
-            joiningDuration: '1 month ago',
-            jobStatus: 'Probation Period',
-            phone: '9699009989',
-            supervisor: 'jhon hally'
-        }
-    ];
-console.log(employees,'employees')
+    const { employees,deleteEmployee} = useManageEmployee();
+    const {Toast, contextHolder} = useToast();
     // Job status color mapping
     const getStatusColor = (status) => {
         const statusColors = {
@@ -57,16 +24,15 @@ console.log(employees,'employees')
         };
         return statusColors[status] || 'default';
     };
-    const handleEdit = (prop) => {
-        const {key} = prop;
-    navigate(`edit/${key}`)
+    const handleEdit = (id) => {
+    navigate(`edit/${id}`)
   };
-  const handleDelete = (record) => {
+  const handleDelete = (id) => {
+    setDeleteId(id);
     setIsOpenModal(true);
   };
-  const handleView = (prop) =>{
-    const {key} = prop;
-    navigate(`profile/${key}`)
+  const handleView = (id) =>{
+    navigate(`profile/${id}`)
   }
 const handleEmptyData = (data) => (data || "--")
     // Employee columns
@@ -176,20 +142,20 @@ const handleEmptyData = (data) => (data || "--")
             type="primary" 
             icon={<EyeOutlined />} 
             size="small"
-            onClick={() => handleView(record)}
+            onClick={() => handleView(record?.user_id)}
           />
           <Button 
             type="primary" 
             icon={<EditOutlined />} 
             size="small"
-            onClick={() => handleEdit(record)}
+            onClick={() => handleEdit(record?.user_id)}
           />
           <Button 
             type="primary" 
             danger 
             icon={<DeleteOutlined />} 
             size="small"
-            onClick={() => handleDelete(record)}
+            onClick={() => handleDelete(record?.user_id)}
           />
         </Space>
       ),
@@ -241,7 +207,10 @@ const handleEmptyData = (data) => (data || "--")
 const AddEmployeeButton = (
    <Button type="primary" onClick={() =>( navigate('create'))}>+{"Add Employee"}</Button>
 )
-const handleDeleteConfirm = () => {
+const handleDeleteModal = () => {
+    deleteEmployee(deleteId,Toast)
+    setIsOpenModal(false);
+    
 
 }
 const handleDeleteCancel = () =>{
@@ -250,13 +219,14 @@ const handleDeleteCancel = () =>{
 }
 const deleteModal = {
     isOpen:isOpenModal,
-    // title:{deleteModal.title},
     message:"This Profile will be Deleted",
-    onOk:handleDeleteConfirm,
+    onOk:handleDeleteModal,
     onCancel:handleDeleteCancel,
 }
     return (
-        <CommonTable
+        <>
+        {contextHolder}
+         <CommonTable
             title="Employee List"
             data={employees}
             columns={employeeColumns}
@@ -270,6 +240,8 @@ const deleteModal = {
             extraButtons={AddEmployeeButton}
             deleteModal={deleteModal}
         />
+        </>
+       
         
     );
 };
