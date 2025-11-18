@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Select, DatePicker, Button, Card, Row, Col, Checkbox, Divider, Radio, Upload, Space, Collapse } from 'antd';
-import { UserOutlined, MailOutlined, PhoneOutlined, LockOutlined, UploadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, PhoneOutlined, LockOutlined, UploadOutlined, PlusOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useManageEmployee, useShift } from '../hooks/useManageEmployee';
 import { useDepartments } from '../hooks/useDepartments';
 import { useDesignations } from '../hooks/useDesignations';
 import { useBranches } from '../hooks/useBranches';
 import { useToast } from '../hooks/useToast';
 import { useMonthlyPayGrades } from '../hooks/useMonthlyPayGrade';
+import { useNavigate, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -14,26 +16,60 @@ const { TextArea } = Input;
 
 const AddEmployeeForm = () => {
     const [form] = Form.useForm();
-    const { addEmployee, supervisors,loading } = useManageEmployee();
+    const { addEmployee,loading,employees,profile,fetchEmployeeById,updateEmployee } = useManageEmployee();
     const { shifts } = useShift();
     const { paygrades } = useMonthlyPayGrades();
     const { Toast, contextHolder } = useToast();
-
-
     const { departments } = useDepartments();
     const { designations } = useDesignations();
     const { branches } = useBranches();
+    const [isEditMode,setIsEditMode] = useState(false)
+
+    const { id } = useParams();
+      const navigate = useNavigate();
+
+        const setFormField = () => {
+        const formattedData = {
+                    ...profile,
+                    date_of_birth: dayjs(employees.date_of_birth) ,
+                    date_of_joining: dayjs(employees.date_of_joining) ,
+                    date_of_leaving: dayjs(employees.date_of_leaving) ,
+                };
+console.log(formattedData,'formattedData');
+
+                // Set form fields with the fetched data
+                form.setFieldsValue(formattedData);
+    };
+    console.log(profile,'employees');
+    
+
+  useEffect(() => {
+    if(id){
+             Object.keys(profile).length === 0 &&   fetchEmployeeById(id)
+
+        setIsEditMode(true);
+
+    setFormField()
+
+
+    }
+        
+  }, [id,profile])
 
     const onFinish = (values) => {
         console.log(values, 'values')
-        const { date_of_birth, date_of_joining } = values;
+        const { date_of_birth, date_of_joining,date_of_leaving } = values;
         const formatedValues = {
             ...values,
             date_of_birth: date_of_birth.format('YYYY-MM-DD'),
             date_of_joining: date_of_joining.format('YYYY-MM-DD'),
+            date_of_leaving: date_of_leaving.format('YYYY-MM-DD'),
         }
         console.log(formatedValues, 'formatedValues')
-        addEmployee(formatedValues, Toast)
+        if(isEditMode){
+            updateEmployee(id,formatedValues, Toast)
+        }else{        addEmployee(formatedValues, Toast)
+}
     };
 
     const uploadProps = {
@@ -50,8 +86,16 @@ const AddEmployeeForm = () => {
 
     return (
         <div style={{ padding: '24px' }}>
+              <Button 
+  type="primary" 
+  icon={<ArrowLeftOutlined />} 
+  onClick={() => navigate(-1)}
+  style={{ marginBottom: '16px' }}
+>
+  Back
+</Button>
             {contextHolder}
-            <Card title="Add Employee" style={{ marginBottom: '24px' }}>
+            <Card title={isEditMode ? "Edit Employee":"Add Employee"} style={{ marginBottom: '24px' }}>
 
                 <Form
                     form={form}
@@ -70,20 +114,21 @@ const AddEmployeeForm = () => {
                                         rules={[{ required: true, message: 'Please select role' }]}
                                     >
                                         <Select placeholder="--- Please Select ---">
-                                            <Option value="admin">Admin</Option>
-                                            <Option value="employee">Employee</Option>
-                                            {/* <Option value="manager">Manager</Option>
-                                            <Option value="supervisor">Supervisor</Option> */}
+                                            <Option value="ADMIN">Admin</Option>
+                                            <Option value="MANAGER">Manager</Option>
+
+                                            <Option value="EMPLOYEE">Employee</Option>
                                         </Select>
                                     </Form.Item>
                                 </Col>
                                 <Col xs={24} sm={6}>
                                     <Form.Item
+                                    
                                         label="User Name"
                                         // name="username"
-                                        rules={[{ required: true, message: 'Please enter username' }]}
+                                        // rules={[{ required: true, message: 'Please enter username' }]}
                                     >
-                                        <Input placeholder="User Name" prefix={<UserOutlined />} />
+                                        <Input disabled={true} placeholder="User Name" prefix={<UserOutlined />} />
                                     </Form.Item>
                                 </Col>
                                 <Col xs={24} sm={6}>
@@ -132,6 +177,8 @@ const AddEmployeeForm = () => {
                                     <Form.Item
                                         label="Last Name"
                                         name="last_name"
+                                         rules={[{ required: true, message: 'Please enter last name' }]}
+
                                     >
                                         <Input placeholder="Last Name" />
                                     </Form.Item>
@@ -148,14 +195,17 @@ const AddEmployeeForm = () => {
                                 </Col>
                                 <Col xs={24} sm={6}>
                                     <Form.Item
+                                        
                                         label="Supervisor"
                                         name="supervisor"
+                                        // rules={[{ required: true, message: 'Please select supervisor' }]}
+
                                     >
-                                        <Select placeholder="--- Please Select ---">
-                                            {Array.isArray(supervisors) && supervisors.length > 0 ? (
-                                                supervisors.map((supervisor) => (
-                                                    <Option key={supervisor.id} value={supervisor.id}>
-                                                        {supervisor.name}
+                                        <Select defaultValue={null} placeholder="--- Please Select ---">
+                                            {Array.isArray(employees) && employees.length > 0 ? (
+                                                employees.map((employee) => (
+                                                    <Option key={employee?.user_id} value={employee?.user_id}>
+                                                        {employee?.name}
                                                     </Option>
                                                 ))
                                             ) : (
@@ -402,7 +452,7 @@ const AddEmployeeForm = () => {
                     <Form.Item style={{ marginTop: '24px', textAlign: 'center' }}>
                         <Space style={{ width: "100%", justifyContent: "space-between" }}>
                             <Button loading={loading} type="primary" htmlType="submit" size="large" style={{ marginRight: '16px' }}>
-                                {"Save"}
+                                  {isEditMode ? "Update" : "Save"}
                             </Button>
                             <Button size="large" onClick={() => form.resetFields()}>
                                 Reset Form

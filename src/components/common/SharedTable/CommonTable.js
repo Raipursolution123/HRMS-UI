@@ -26,13 +26,14 @@ const CommonTable = ({
   deleteModal,
   formModal,
 }) => {
+  console.log(deleteModal,'deleteModal')
   const getDeleteModalProps = (flag) => {
     if (deleteModal) {
       switch (flag) {
         case "isOpen": return (deleteModal.isOpen);
         case "message": return (deleteModal.message);
-        case "handleDeleteConfirm": return (deleteModal.handleDeleteConfirm);
-        case "handleDeleteCancel": return (deleteModal.handleDeleteCancel);
+        case "onOk": return (deleteModal.onOk);
+        case "onCancel": return (deleteModal.onCancel);
         default: return null;
       }
     }
@@ -98,8 +99,8 @@ const CommonTable = ({
           isOpen={getDeleteModalProps("isOpen")}
           title={getDeleteModalProps("title")}
           message={getDeleteModalProps("message")}
-          onOk={getDeleteModalProps("handleDeleteConfirm")}
-          onCancel={getDeleteModalProps("handleDeleteCancel")}
+          onOk={getDeleteModalProps("onOk")}
+          onCancel={getDeleteModalProps("onCancel")}
         />
       )}
 
