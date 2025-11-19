@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
 import { Card, Descriptions, Table, Divider, Tag, Avatar, Row, Col, Skeleton, Button } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, CalendarOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useManageEmployee } from '../hooks/useManageEmployee';
 import { useEducational } from '../hooks/useEducational';
 import { useExperiences } from '../hooks/useExperiences';
 
 const Profile = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { fetchEmployeeById, loading,profile } = useManageEmployee();
   const { educationals, refetch } = useEducational();
   const { experiences, fetchExperience } = useExperiences();
@@ -64,17 +63,6 @@ const Profile = () => {
     },
   ];
 
-  const educationData = [
-    {
-      key: '1',
-      institute: '--',
-      degree: '--',
-      boardUniversity: '--',
-      result: '--',
-      gpa: '--',
-      passingYear: '--'
-    }
-  ];
 
   // Professional Experience Data
   const experienceColumns = [
@@ -120,28 +108,9 @@ const Profile = () => {
     },
   ];
 
-  const experienceData = [
-    {
-      key: '1',
-      organization: '--',
-      designation: '--',
-      duration: '--',
-      skills: [],
-      responsibility: '--'
-    }
-  ];
-
   return (
     <div style={{ padding: '24px' }}>
       {/* Profile Header */}
-      <Button 
-  type="primary" 
-  icon={<ArrowLeftOutlined />} 
-  onClick={() => navigate(-1)}
-  style={{ marginBottom: '16px' }}
->
-  Back
-</Button>
       <Card style={{ marginBottom: '24px' }}>
         <Row gutter={16} align="middle">
           <Col>
