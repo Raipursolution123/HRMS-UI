@@ -75,37 +75,46 @@ console.log(formattedData,'formattedData');
 }
     };
 
-       const uploadProps = {
-        beforeUpload: (file) => {
-            const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-            if (!isJpgOrPng) {
-                Toast('error', 'You can only upload JPG/PNG file!');
-                return Upload.LIST_IGNORE;
+//  const [fileList, setFileList] = useState([]);
+
+const uploadProps = {
+    beforeUpload: (file) => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+            Toast('error', 'You can only upload JPG/PNG file!');
+            return Upload.LIST_IGNORE;
+        }
+        
+        // Custom file object create karein
+        const customFileObject = {
+            uid: file.uid,
+            lastModified: file.lastModified,
+            lastModifiedDate: file.lastModifiedDate,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            percent: 0,
+            originFileObj: {
+                uid: file.uid
             }
-            
-            // Add file to fileList with status
-            const newFile = {
-                uid: file.uid,
-                name: file.name,
-                status: 'done',
-            };
-            setFileList([newFile]);
-            
-            // Don't auto upload
-            return false;
-        },
-        maxCount: 1,
-        fileList: fileList,
-        onRemove: () => {
-            setFileList([]);
-            form.setFieldValue('photo', null);
-        },
-        onChange: (info) => {
-            if (info.file.status === 'done') {
-                setFileList(info.fileList);
-            }
-        },
-    };
+        };
+        
+        // Sirf ek file rakhein array mein
+        setFileList([customFileObject]);
+        
+        // Form field mein bhi set karein
+        form.setFieldValue('photo', [customFileObject]);
+        
+        // Auto upload rok dein
+        return false;
+    },
+    maxCount: 1,
+    fileList: fileList,
+    onRemove: () => {
+        setFileList([]);
+        form.setFieldValue('photo', null);
+    },
+};
 
     const uploadButton = (
         <Button 
