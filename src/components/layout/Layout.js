@@ -250,6 +250,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import { getMenuItems } from '../../constants/menuItem'; // Updated import
 import BackButton from '../common/BackButton/BackButton';
+import { useToast } from '../../hooks/useToast';
 
 const { Header, Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -261,6 +262,7 @@ const MainLayout = () => {
   const location = useLocation();
   const screens = useBreakpoint();
   const { profile } = useSelector((state) => state.user);
+      const {Toast,contextHolder} = useToast();
   
   // Get role-based menu items
   const menuItems = useMemo(() => {
@@ -271,9 +273,19 @@ const MainLayout = () => {
     navigate(key);
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
+  const handleLogout = async() => {
+     try {
+          const result = await dispatch(dispatch(logout())).unwrap();
+          Toast.success("Logout Successfully")
+    
+        } catch (error) {
+          Toast.error("something went wrong")
+        }finally{
+          setTimeout(()=>{    navigate('/login');
+},300)
+
+        }
+    ;
   };
 
   const userMenuItems = [
@@ -354,9 +366,10 @@ const MainLayout = () => {
       {location.pathname !== '/' && <BackButton/>}
     </Header>
   );
-const getFullName=(prams)=>(prams.first_name + " " +prams.last_name)
+const getFullName=(prams)=>(prams?.first_name + " " +prams?.last_name)
   return (
     <Layout style={{ minHeight: '100vh' }}>
+      {contextHolder}
       <Sider
         trigger={null}
         collapsible
@@ -390,10 +403,10 @@ const getFullName=(prams)=>(prams.first_name + " " +prams.last_name)
               />
               <div style={{ color: 'white' }}>
                 <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
-                  {getFullName(profile.profile) || 'User'}
+                  {getFullName(profile?.profile) || 'User'}
                 </div>
                 <div style={{ fontSize: '12px', opacity: 0.7 }}>
-                  {profile?.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : 'Employee'}
+                  {profile?.role ? profile?.role.charAt(0)?.toUpperCase() + profile?.role?.slice(1) : 'Employee'}
                 </div>
               </div>
             </div>

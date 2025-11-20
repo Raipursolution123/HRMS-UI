@@ -6,16 +6,22 @@ import { Form, Input, Button, Card, message, Typography, Image } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { login, clearError } from '../store/slices/authSlice';
 import logo from '../assets/images/logo.svg';
+import { useToast } from '../hooks/useToast';
 const { Title } = Typography;
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+    const {Toast,contextHolder} = useToast();
+  
 
   useEffect(() => {
     if (isAuthenticated) {
+      setTimeout(()=>{
       navigate('/');
+
+      },[300])
     }
   }, [isAuthenticated, navigate]);
 
@@ -26,8 +32,16 @@ const Login = () => {
     }
   }, [error, dispatch]);
 
-  const onFinish = (values) => {
-    dispatch(login(values));
+  const onFinish = async(values) => {
+
+    try {
+      const result = await dispatch(login(values)).unwrap();
+      Toast.success("Login Successfully")
+
+    } catch (error) {
+      Toast.error("something went wrong")
+    }
+
   };
 
   return (
@@ -40,6 +54,7 @@ const Login = () => {
         backgroundColor: '#e6e9ff',
       }}
     >
+      {contextHolder}
       <Card
         style={{
           width: 380,
