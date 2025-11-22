@@ -10,6 +10,7 @@ import {
   Space,
   Grid,
   Breadcrumb,
+  Spin
 } from 'antd';
 import {
   MenuFoldOutlined,
@@ -20,10 +21,11 @@ import {
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
-import { getMenuItems } from '../../constants/menuItem';
+// import { transformPagesToMenuItems } from '../../constants/menuItem';
 import BackButton from '../common/BackButton/BackButton';
 import { useToast } from '../../hooks/useToast';
 import ErrorBoundary from 'antd/es/alert/ErrorBoundary';
+import { transformPagesToMenuItems } from '../../utils/menuTransformer';
 
 const { Header, Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -34,14 +36,18 @@ const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const screens = useBreakpoint();
-  const { profile } = useSelector((state) => state?.user);
   const { Toast, contextHolder } = useToast();
   
-  // Safe role formatting function - updated for new role structure
+  // Redux store se user data get karein
+  const user = useSelector((state) => state.user);
+  console.log(user, 'user');
+  const profile = user?.profile?.profile;
+  const role = user?.profile?.role;
+
+  // Safe role formatting function
   const formatRole = (role) => {
     if (!role) return 'Employee';
     
-    // Handle both string role and object role
     if (typeof role === 'object' && role !== null) {
       return role.name || 'Employee';
     }
@@ -50,23 +56,36 @@ const MainLayout = () => {
     return roleString.charAt(0).toUpperCase() + roleString.slice(1).toLowerCase();
   };
 
-  // Get role name for menu items - updated for new role structure
-  const getRoleName = (role) => {
-    if (!role) return 'ADMIN';
-    
-    if (typeof role === 'object' && role !== null) {
-      // return role.name || 'ADMIN';
-      return 'ADMIN';
+  // Get user pages from Redux store
+  const getUserPages = () => {
+    if (role?.pages && Array.isArray(role.pages)) {
+      return role.pages;
     }
-    
-    return String(role).toUpperCase();
+    return [];
   };
 
-  // Get role-based menu items
+  // Directly userPages se menu items generate karein
   const menuItems = useMemo(() => {
-    const roleName = getRoleName(profile?.role);
-    return getMenuItems(roleName);
-  }, [profile?.role]);
+    const userPages = getUserPages();
+
+    console.log(userPages,'userPages',role)
+    
+    console.log('Building menu from userPages:', {
+      userPagesCount: userPages.length,
+      userPages
+    });
+
+    // Agar pages available hain to transform karein
+    if (userPages.length > 0) {
+      const transformedItems = transformPagesToMenuItems(userPages);
+      console.log('Transformed menu items:', transformedItems);
+      return transformedItems;
+    }
+
+    // Agar koi page nahi hai to empty array return karein
+    console.warn('No pages available for menu');
+    return [];
+  }, [role, role?.pages]); // Re-run when role or pages change
 
   const handleMenuClick = ({ key }) => {
     navigate(key);
@@ -164,14 +183,27 @@ const MainLayout = () => {
     </Header>
   );
 
-  const getFullName = (profileData) => {
-    if (!profileData) return 'User';
-    return `${profileData?.profile?.first_name || ''} ${profileData?.profile?.last_name || ''}`.trim() || 'User';
+  const getFullName = () => {
+    if (!profile) return 'User';
+    return `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'User';
   };
 
-  // Updated role and name display logic
-  const formattedRole = formatRole(profile?.role);
-  const displayName = getFullName(profile) || 'User';
+  const formattedRole = formatRole(role);
+  const displayName = getFullName() || 'User';
+
+  // Agar user data loading hai to loading show karein
+  if (!user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        <Spin size="large" tip="Loading..." />
+      </div>
+    );
+  }
 
   return (
     <Layout style={{ minHeight: '100vh' }}>

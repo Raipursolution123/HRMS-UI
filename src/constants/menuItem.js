@@ -488,6 +488,7 @@ import {
   TrophyOutlined,
   NotificationOutlined,
 } from '@ant-design/icons';
+import { usePages } from '../hooks/pages/usePages';
 
 // Role-based menu items
 export const getMenuItems = (userRole) => {
@@ -1009,4 +1010,39 @@ export const getMenuItems = (userRole) => {
   };
 
   return filterMenuByRole(allMenuItems, userRole);
+};
+
+export const getIconComponent = (iconName) => {
+  const iconMap = {
+    SettingOutlined: <SettingOutlined />,
+    ClockCircleOutlined: <ClockCircleOutlined />,
+    DashboardOutlined: <DashboardOutlined />,
+    BarChartOutlined: <BarChartOutlined />,
+    CalendarOutlined: <CalendarOutlined />,
+    DollarOutlined: <DollarOutlined />,
+    TrophyOutlined: <TrophyOutlined />,
+    TeamOutlined: <TeamOutlined />,
+    NotificationOutlined: <NotificationOutlined />,
+    UserAddOutlined: <UserAddOutlined />,
+    ReadOutlined: <ReadOutlined />,
+    ScheduleOutlined: <ScheduleOutlined />,
+    FileTextOutlined: <FileTextOutlined />,
+    UserOutlined: <UserOutlined />,
+    ApartmentOutlined: <ApartmentOutlined />,
+    BankOutlined: <BankOutlined />,
+    WarningOutlined: <WarningOutlined />,
+    RiseOutlined: <RiseOutlined />,
+    CheckCircleOutlined: <CheckCircleOutlined />,
+    ProfileOutlined: <ProfileOutlined />,
+    CalculatorOutlined: <CalculatorOutlined />,
+    PlusOutlined: <PlusOutlined />,
+    KeyOutlined: <KeyOutlined />,
+    UnlockOutlined: <UnlockOutlined />,
+    MinusOutlined: <MinusOutlined />,
+    CheckOutlined: <CheckOutlined />,
+    GiftOutlined: <GiftOutlined />,
+    SafetyCertificateOutlined: <SafetyCertificateOutlined />,
+  };
+  
+  return iconMap[iconName] || <SettingOutlined />;
 };
