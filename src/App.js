@@ -49,11 +49,18 @@ import ChangePassword from './pages/Administration/ChangePassword';
 import AddPermission from './pages/Administration/AddPermission';
 import AddRole from './pages/Administration/AddRole';
 import HourlyPayGrade from './pages/Payroll/HourlyPayGrade';
-import TaxruleSetup from './pages/Payroll/setup/TaxruleSetup';
+import TaxRuleSetup from './pages/Payroll/setup/TaxRuleSetup';
 import LateConfiguration from './pages/Payroll/setup/LateConfiguration';
 import Allowance from './pages/Payroll/Allowance';
 import Deductions from './pages/Payroll/Deductions';
 import GenerateSalarySheet from './pages/Payroll/GenerateSalarySheet';
+import PaymentHistory from './pages/Payroll/PaymentHistory';
+import BonusSetting from './pages/Payroll/BonusSetting';
+import MyPayroll from './pages/Payroll/MyPayroll';
+import ApproveWorkHour from './pages/Payroll/ApproveWorkHour';
+import GenerateBonus from './pages/Payroll/GenerateBonus';
+import GenerateBulkSalarySheet from './pages/Payroll/GenerateBulkSalarySheet';
+import AddSalarySheet from './pages/Payroll/AddSalarySheet';
 
 function App() {
   return (
@@ -132,24 +139,28 @@ function App() {
              <Route path='payroll'>
                <Route path='setup'>
               
-              <Route path='tax-rule-setup' element={<TaxruleSetup/>}/>
+              <Route path='tax-rule-setup' element={<TaxRuleSetup/>}/>
               <Route path='late-configuration' element={<LateConfiguration/>} />
              </Route>
               <Route path='allowance' element={<Allowance/>} />
               <Route path='deduction' element={<Deductions/>} />
               <Route path='monthly-pay-grade' element={<MonthlyPayGrade/>}/>
               <Route path='hourly-pay-grade' element={<HourlyPayGrade/>} />
-              <Route path='generate-salary-sheet' />
- <Route path='report' >
-                  <Route path='payment-history' element={<DailyAttendance/>}/>
-                  <Route path='my-payroll' element={<MonthlyAttendance/>}/>
+              <Route path='generate-salary-sheet'element={<GenerateSalarySheet/>} />
+              <Route path='report' >
+                  <Route path='payment-history' element={<PaymentHistory/>}/>
+                  <Route path='my-payroll' element={<MyPayroll/>}/>
                 </Route>
                  <Route path='manage-work-hour'>
-                  <Route path='approve-work-hour' element={<DailyAttendance/>}/>
+                  <Route path='approve-work-hour' element={<ApproveWorkHour/>}/>
                 </Route>
                 <Route path='manage-bonus' >
-                  <Route path='bonus-setting' element={<DailyAttendance/>}/>
-                  <Route path='my-generate-bonus' element={<MonthlyAttendance/>}/>
+                  <Route path='bonus-setting' element={<BonusSetting/>}/>
+                  <Route path='generate-bonus' element={<GenerateBonus/>}/>
+                </Route>
+                <Route path='salary'>
+                  <Route path='generate-bulk' element={<GenerateBulkSalarySheet/>} />
+                  <Route path='generate' element={<AddSalarySheet/>} />
                 </Route>
                        
              </Route>

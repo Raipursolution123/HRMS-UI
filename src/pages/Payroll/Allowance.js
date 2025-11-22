@@ -1,109 +1,122 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Card, Row, Col, Select, message, Input } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { useToast } from '../../hooks/useToast';
-// import SharedModal from '../components/common/SharedModal/SharedModal';
-// import { useDepartments } from '../hooks/useDepartments';
-// import ConfirmModal from '../components/common/SharedModal/ConfirmModal';
-// import { useToast } from '../hooks/useToast';
-const { Option } = Select;
-
+import React, { useState } from "react";
+import { Table, Button, Space, Card, Row, Col, Select, Input, Modal, } from "antd";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { useToast } from "../../hooks/useToast";
+import { useAllowances } from "../../hooks/payroll/useAllowance";
+import AllowanceModal from "../../components/common/SharedModal/AllowanceModal";
 
 const Allowance = () => {
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { Toast, contextHolder } = useToast();
+  const { allowances, loading, pagination, setPagination, handleSearch,
+    createAllowance, updateAllowance, deleteAllowance } = useAllowances();
 
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [selectedDept, setSelectedDept] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [editingAllowance, setEditingAllowance] = useState(null);
+  const [searchText, setSearchText] = useState("");
 
-  // added editingDept state
-  const [editingDept, setEditingDept] = useState(null);
+  const [modal, modalContextHolder] = Modal.useModal();
 
-  const [searchText, setSearchText] = useState('');
-
-
-
-//   const { departments, loading, error, refetch, addDepartment, updateDepartment, deleteDepartment } = useDepartments();
-
-
-  const handleAddDepartment = async (values) => {
-  if (editingDept) {
-    // await updateDepartment(editingDept.id, values, Toast);
-    
-  } else {
-    // await addDepartment(values);
-    Toast.success("Department added successfully");
-  }
-
-  setIsModalOpen(false);
-  setEditingDept(null);
-};
-
-//   const loadDepartments = async (page = currentPage, size = pageSize, search = searchText) => {
-//     const data = await refetch(page, size, search);
-//     if (data && data.count !== undefined) setTotal(data.count);
-//   };
-  const [total, setTotal] = useState(0);
-
-  // Fetch when page, size, or search changes
-//   useEffect(() => {
-//     loadDepartments(currentPage, pageSize, searchText);
-//   }, [currentPage, pageSize, searchText]);
-
-  const handleSearch = (value) => {
-    setSearchText(value.toLowerCase());
-    setCurrentPage(1); // reset to page 1
+  const openAddModal = () => {
+    setEditingAllowance(null);
+    setIsModalOpen(true);
   };
 
+  const openEditModal = (record) => {
+    setEditingAllowance(record);
+    setIsModalOpen(true);
+  };
 
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setEditingAllowance(null);
+  };
+
+  const handleModalSubmit = async (values) => {
+    setSubmitting(true);
+    try {
+      if (editingAllowance) {
+        await updateAllowance(editingAllowance.id, values);
+        Toast.success("Succesfully Updated")
+      } else {
+        await createAllowance(values);
+        Toast.success("Succesfully Added")
+      }
+      setIsModalOpen(false);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  const handleDelete = (record) => {
+    modal.confirm({
+      title: "Delete Allowance",
+      content: `Are you sure you want to delete "${record.allowance_name}"?`,
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteAllowance(record.id);
+          Toast.success("Deleted Succesfully")
+        } catch (err) {
+          Toast.error("Faied to Delete")
+        }
+      },
+    });
+  };
+
+  const handleTableChange = (page, size) => {
+    setPagination((p) => ({ ...p, current: page, pageSize: size }));
+  };
 
   const columns = [
     {
-      title: 'S/L',
-      dataIndex: 'sl',
-      key: 'sl',
+      title: "S/L",
+      dataIndex: "sl",
+      key: "sl",
       width: 80,
-      align: 'center',
-      render: (_, __, index) => index + 1, // ✅ auto index
+      align: "center",
+      render: (_, __, index) =>
+        (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
-      title: 'Allowance Name',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
-    },
-     {
-      title: 'Allowance Type',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
-    },
-     {
-      title: 'Percentage of Basic',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
-    },
-     {
-      title: 'Limit Per Month',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
+      title: "Allowance Name",
+      dataIndex: "allowance_name",
+      key: "allowance_name",
+      align: "left",
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Allowance Type",
+      dataIndex: "allowance_type_display",
+      key: "allowance_type_display",
+      align: "left",
+    },
+    {
+      title: "Percentage of Basic",
+      dataIndex: "percentage_of_basic",
+      key: "percentage_of_basic",
+      align: "left",
+      render: (v) => (v ?? "-"),
+    },
+    {
+      title: "Limit Per Month",
+      dataIndex: "limit_per_month",
+      key: "limit_per_month",
+      align: "left",
+      render: (v) => (v ?? "-"),
+    },
+    {
+      title: "Action",
+      key: "action",
       width: 120,
-      align: 'center',
+      align: "center",
       render: (_, record) => (
         <Space size="small">
           <Button
             type="primary"
             icon={<EditOutlined />}
             size="small"
-            onClick={() => handleEdit(record)}
+            onClick={() => openEditModal(record)}
           />
           <Button
             type="primary"
@@ -117,149 +130,80 @@ const Allowance = () => {
     },
   ];
 
-  const handleEdit = (record) => {
-    // record is table row. ensure it contains id & name
-    // setEditingDept({ id: record.id ?? record.key, name: record.name });
-    // setIsModalOpen(true);
-  };
-
-  const handleDelete = (record) => {
-    // console.log("Delete clicked for:", record);
-    // setSelectedDept(record);
-    // setIsConfirmOpen(true)
-  };
-//   const handleConfirmDelete = async () => {
-//     if (!selectedDept) return;
-//     try {
-//        await deleteDepartment(selectedDept.id);
-//     Toast.success(`Deleted: ${selectedDept.name}`);
-
-//     const result = await refetch(currentPage, pageSize, searchText);
-
-//     if (result?.results?.length === 0 && currentPage > 1) {
-//       const newPage = currentPage - 1;
-//       setCurrentPage(newPage);
-
-//       await refetch(newPage, pageSize, searchText);
-//     }
-//     } catch (error) {
-//       Toast.error('Failed to delete department')
-//       console.error(error);
-//     } finally {
-//       setIsConfirmOpen(false);
-//       setSelectedDept(null);
-//     }
-//   };
-
-//   const handleCancelDelete = () => {
-//     setIsConfirmOpen(false);
-//     setSelectedDept(null);
-//   };
-
-
-//   const handleAddNew = () => {
-//     setEditingDept(null);
-//     setIsModalOpen(true);
-//   };
-
-//   const pagination = {
-//     current: currentPage,
-//     pageSize: pageSize,
-//     total: total,
-//     showSizeChanger: true,
-//     showQuickJumper: true,
-//     showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-//     pageSizeOptions: ['10', '20', '50', '100'],
-//     onChange: (page, size) => {
-//       setCurrentPage(page);
-//       setPageSize(size);
-//     },
-//   };
-
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: "24px" }}>
       {contextHolder}
+      {modalContextHolder}
+
       <Card
         title="Allowance List"
         extra={
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            // onClick={handleAddNew}
-          >
+          <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal}>
             Add New Allowance
           </Button>
         }
       >
-        <Row style={{ marginBottom: 16 }} align="middle" justify="space-between">
+        <Row
+          style={{ marginBottom: 16 }}
+          align="middle"
+          justify="space-between"
+        >
           <Col>
             <span style={{ marginRight: 8 }}>Show</span>
             <Select
-              value={pageSize}
-              onChange={(value) => setPageSize(value)}
+              value={pagination.pageSize}
+              onChange={(value) => setPagination((p) => ({ ...p, pageSize: value }))}
               style={{ width: 80, marginRight: 8 }}
             >
-              <Option value={10}>10</Option>
-              <Option value={20}>20</Option>
-              <Option value={50}>50</Option>
-              <Option value={100}>100</Option>
+              <Select.Option value={10}>10</Select.Option>
+              <Select.Option value={20}>20</Select.Option>
+              <Select.Option value={50}>50</Select.Option>
+              <Select.Option value={100}>100</Select.Option>
             </Select>
             <span>entries</span>
           </Col>
+
           <Col>
             <Input.Search
               placeholder="Search Allowance..."
               allowClear
-              onChange={(e) => handleSearch(e.target.value)}
               style={{ width: 250 }}
+              value={searchText}
+              onChange={(e) => {
+                const q = e.target.value;
+                setSearchText(q);
+                handleSearch(q);
+              }}
             />
           </Col>
         </Row>
 
         <Table
           columns={columns}
-        //   dataSource={departments
-        //     .filter((d) => d.name.toLowerCase().includes(searchText))
-        //     .map((d, i) => ({
-        //       key: d.id || i,
-        //       id: d.id,
-        //       sl: i + 1,
-        //       name: d.name,
-        //     }))
-        //   }
-
-        //   loading={loading}
-        //   pagination={pagination}
-          size="middle"
+          dataSource={allowances.map((a) => ({ ...a, key: a.id })) || []}
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            onChange: handleTableChange,
+            pageSizeOptions: ["10", "20", "50", "100"],
+            showTotal: (t, range) => `Showing ${range[0]} to ${range[1]} of ${t} entries`,
+          }}
           bordered
-          scroll={{ x: 400 }}
+          size="middle"
+          scroll={{ x: 600 }}
         />
       </Card>
-      {/* {isModalOpen && (
-        <SharedModal
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          onSubmit={handleAddDepartment} //  pass the handler
-          editingDept={editingDept} // pass for prefill in modal
-          loading={loading}
-          fieldLabel={[
-            {
-              label: 'Department Name',
-              name: 'name',
-              isRequired: true,
-              component: <Input placeholder="Enter Department Name" size="large" />,
-            },
-          ]}
-        />
-      )}
-      <ConfirmModal
-        isOpen={isConfirmOpen}
-        title="Delete Department"
-        message={`Are you sure you want to delete "${selectedDept?.name}"?`}
-        onOk={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-      /> */}
 
+      <AllowanceModal
+        open={isModalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleModalSubmit}
+        initialValues={editingAllowance}
+        submitting={submitting}
+      />
     </div>
   );
 };

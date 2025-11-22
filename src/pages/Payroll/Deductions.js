@@ -1,193 +1,158 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Card, Row, Col, Select, message, Input } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { useToast } from '../../hooks/useToast';
-// import SharedModal from '../components/common/SharedModal/SharedModal';
-// import { useDepartments } from '../hooks/useDepartments';
-// import ConfirmModal from '../components/common/SharedModal/ConfirmModal';
-// import { useToast } from '../hooks/useToast';
+// src/pages/Payroll/Deductions.jsx
+import React, { useState } from "react";
+import { Table, Button, Space, Card, Row, Col, Select, Input } from "antd";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { useToast } from "../../hooks/useToast";
+import { useDeductions } from "../../hooks/payroll/useDeduction";
+import DeductionModal from "../../components/common/SharedModal/DeductionModal";
+import ConfirmModal from "../../components/common/SharedModal/ConfirmModal";
+
 const { Option } = Select;
 
-
 const Deductions = () => {
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { Toast, contextHolder } = useToast();
+  const {
+    deductions,
+    loading,
+    pagination,
+    setPagination,
+    handleSearch,
+    createDeduction,
+    updateDeduction,
+    deleteDeduction,
+  } = useDeductions();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [editingDeduction, setEditingDeduction] = useState(null);
+
+  const [searchText, setSearchText] = useState("");
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [selectedDept, setSelectedDept] = useState(null);
+  const [selectedDeduction, setSelectedDeduction] = useState(null);
 
-  // added editingDept state
-  const [editingDept, setEditingDept] = useState(null);
-
-  const [searchText, setSearchText] = useState('');
-
-
-
-//   const { departments, loading, error, refetch, addDepartment, updateDepartment, deleteDepartment } = useDepartments();
-
-
-  const handleAddDepartment = async (values) => {
-  if (editingDept) {
-    // await updateDepartment(editingDept.id, values, Toast);
-    
-  } else {
-    // await addDepartment(values);
-    Toast.success("Department added successfully");
-  }
-
-  setIsModalOpen(false);
-  setEditingDept(null);
-};
-
-//   const loadDepartments = async (page = currentPage, size = pageSize, search = searchText) => {
-//     const data = await refetch(page, size, search);
-//     if (data && data.count !== undefined) setTotal(data.count);
-//   };
-  const [total, setTotal] = useState(0);
-
-  // Fetch when page, size, or search changes
-//   useEffect(() => {
-//     loadDepartments(currentPage, pageSize, searchText);
-//   }, [currentPage, pageSize, searchText]);
-
-  const handleSearch = (value) => {
-    setSearchText(value.toLowerCase());
-    setCurrentPage(1); // reset to page 1
+  const openAddModal = () => {
+    setEditingDeduction(null);
+    setIsModalOpen(true);
   };
 
+  const openEditModal = (record) => {
+    setEditingDeduction(record);
+    setIsModalOpen(true);
+  };
 
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setEditingDeduction(null);
+  };
+
+  const handleModalSubmit = async (values) => {
+    setSubmitting(true);
+    try {
+      if (editingDeduction) {
+        await updateDeduction(editingDeduction.id, values);
+        Toast.success("Updated Succesfully")
+      } else {
+        await createDeduction(values);
+        Toast.success("Added Succesfully")
+      }
+      setIsModalOpen(false);
+    } catch (err) {
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onSearchChange = (value) => {
+    setSearchText(value);
+    handleSearch(value);
+  };
+
+  const handleDeleteClick = (record) => {
+    setSelectedDeduction(record);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedDeduction) return;
+    try {
+      await deleteDeduction(selectedDeduction.id);
+      Toast.success("Deduction Deleted Succesfully")
+    } catch (err) {
+      Toast.error("Failed")
+    } finally {
+      setIsConfirmOpen(false);
+      setSelectedDeduction(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsConfirmOpen(false);
+    setSelectedDeduction(null);
+  };
+
+  const handleTableChange = (page, pageSize) => {
+    setPagination((p) => ({ ...p, current: page, pageSize }));
+  };
 
   const columns = [
     {
-      title: 'S/L',
-      dataIndex: 'sl',
-      key: 'sl',
+      title: "S/L",
+      dataIndex: "sl",
+      key: "sl",
       width: 80,
-      align: 'center',
-      render: (_, __, index) => index + 1, // ✅ auto index
+      align: "center",
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
-      title: 'Deduction Name',
-      dataIndex: 'Deduction Name',
-      key: 'Deduction Name',
-      align: 'left',
-    },
-     {
-      title: 'Deduction Type',
-      dataIndex: 'Deduction Name',
-      key: 'Deduction Name',
-      align: 'left',
-    },
-     {
-      title: 'Percentage of Basic',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
-    },
-     {
-      title: 'Limit Per Month',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
+      title: "Deduction Name",
+      dataIndex: "deduction_name",
+      key: "deduction_name",
+      align: "left",
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Deduction Type",
+      dataIndex: "deduction_type_display",
+      key: "deduction_type_display",
+      align: "left",
+    },
+    {
+      title: "Percentage of Basic",
+      dataIndex: "percentage_of_basic",
+      key: "percentage_of_basic",
+      align: "left",
+      render: (v) => (v == null ? "-" : String(v)),
+    },
+    {
+      title: "Limit Per Month",
+      dataIndex: "limit_per_month",
+      key: "limit_per_month",
+      align: "left",
+      render: (v) => (v == null ? "-" : String(v)),
+    },
+    {
+      title: "Action",
+      key: "action",
       width: 120,
-      align: 'center',
+      align: "center",
       render: (_, record) => (
         <Space size="small">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => handleEdit(record)}
-          />
-          <Button
-            type="primary"
-            danger
-            icon={<DeleteOutlined />}
-            size="small"
-            onClick={() => handleDelete(record)}
-          />
+          <Button type="primary" icon={<EditOutlined />} size="small" onClick={() => openEditModal(record)} />
+          <Button danger type="primary" icon={<DeleteOutlined />} size="small" onClick={() => handleDeleteClick(record)} />
         </Space>
       ),
     },
   ];
 
-  const handleEdit = (record) => {
-    // record is table row. ensure it contains id & name
-    // setEditingDept({ id: record.id ?? record.key, name: record.name });
-    // setIsModalOpen(true);
-  };
-
-  const handleDelete = (record) => {
-    // console.log("Delete clicked for:", record);
-    // setSelectedDept(record);
-    // setIsConfirmOpen(true)
-  };
-//   const handleConfirmDelete = async () => {
-//     if (!selectedDept) return;
-//     try {
-//        await deleteDepartment(selectedDept.id);
-//     Toast.success(`Deleted: ${selectedDept.name}`);
-
-//     const result = await refetch(currentPage, pageSize, searchText);
-
-//     if (result?.results?.length === 0 && currentPage > 1) {
-//       const newPage = currentPage - 1;
-//       setCurrentPage(newPage);
-
-//       await refetch(newPage, pageSize, searchText);
-//     }
-//     } catch (error) {
-//       Toast.error('Failed to delete department')
-//       console.error(error);
-//     } finally {
-//       setIsConfirmOpen(false);
-//       setSelectedDept(null);
-//     }
-//   };
-
-//   const handleCancelDelete = () => {
-//     setIsConfirmOpen(false);
-//     setSelectedDept(null);
-//   };
-
-
-//   const handleAddNew = () => {
-//     setEditingDept(null);
-//     setIsModalOpen(true);
-//   };
-
-//   const pagination = {
-//     current: currentPage,
-//     pageSize: pageSize,
-//     total: total,
-//     showSizeChanger: true,
-//     showQuickJumper: true,
-//     showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-//     pageSizeOptions: ['10', '20', '50', '100'],
-//     onChange: (page, size) => {
-//       setCurrentPage(page);
-//       setPageSize(size);
-//     },
-//   };
-
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: "24px" }}>
       {contextHolder}
+
       <Card
-        title="Allowance List"
+        title="Deductions List"
         extra={
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            // onClick={handleAddNew}
-          >
-            Add New Allowance
+          <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal}>
+            Add New Deduction
           </Button>
         }
       >
@@ -195,8 +160,8 @@ const Deductions = () => {
           <Col>
             <span style={{ marginRight: 8 }}>Show</span>
             <Select
-              value={pageSize}
-              onChange={(value) => setPageSize(value)}
+              value={pagination.pageSize}
+              onChange={(value) => setPagination((p) => ({ ...p, pageSize: value }))}
               style={{ width: 80, marginRight: 8 }}
             >
               <Option value={10}>10</Option>
@@ -206,60 +171,54 @@ const Deductions = () => {
             </Select>
             <span>entries</span>
           </Col>
+
           <Col>
             <Input.Search
-              placeholder="Search Allowance..."
+              placeholder="Search Deduction..."
               allowClear
-              onChange={(e) => handleSearch(e.target.value)}
               style={{ width: 250 }}
+              value={searchText}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
           </Col>
         </Row>
 
         <Table
           columns={columns}
-        //   dataSource={departments
-        //     .filter((d) => d.name.toLowerCase().includes(searchText))
-        //     .map((d, i) => ({
-        //       key: d.id || i,
-        //       id: d.id,
-        //       sl: i + 1,
-        //       name: d.name,
-        //     }))
-        //   }
-
-        //   loading={loading}
-        //   pagination={pagination}
+          dataSource={(deductions || []).map((d) => ({ key: d.id, ...d }))}
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            onChange: (page, size) => handleTableChange(page, size),
+            pageSizeOptions: ["10", "20", "50", "100"],
+            showQuickJumper: true,
+            showTotal: (t, range) => `Showing ${range[0]} to ${range[1]} of ${t} entries`,
+          }}
+          rowKey={(r) => r.id}
           size="middle"
           bordered
-          scroll={{ x: 400 }}
+          scroll={{ x: 800 }}
         />
       </Card>
-      {/* {isModalOpen && (
-        <SharedModal
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          onSubmit={handleAddDepartment} //  pass the handler
-          editingDept={editingDept} // pass for prefill in modal
-          loading={loading}
-          fieldLabel={[
-            {
-              label: 'Department Name',
-              name: 'name',
-              isRequired: true,
-              component: <Input placeholder="Enter Department Name" size="large" />,
-            },
-          ]}
-        />
-      )}
+
+      <DeductionModal
+        open={isModalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleModalSubmit}
+        initialValues={editingDeduction}
+        submitting={submitting}
+      />
+
       <ConfirmModal
         isOpen={isConfirmOpen}
-        title="Delete Department"
-        message={`Are you sure you want to delete "${selectedDept?.name}"?`}
+        title="Delete Deduction"
+        message={`Are you sure you want to delete "${selectedDeduction?.deduction_name}"?`}
         onOk={handleConfirmDelete}
         onCancel={handleCancelDelete}
-      /> */}
-
+      />
     </div>
   );
 };
