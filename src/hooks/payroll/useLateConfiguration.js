@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+/*import { useState, useEffect } from 'react';
 import { LateConfigurationAPI } from '../../services/Payroll/lateConfigurationAPI';
 
 export const useLateConfiguration = () => {
@@ -73,6 +73,76 @@ export const useLateConfiguration = () => {
     error,
     refetch: fetchRules,
     addRule,
+    updateRule,
+    deleteRule,
+  };
+};*/
+import { useState, useEffect } from "react";
+import { lateConfigurationAPI } from "../../services/Payroll/lateConfigurationAPI";
+import { useToast } from "../useToast";
+
+export const useLateConfiguration = () => {
+  const [rules, setRules] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { Toast } = useToast(); // FIXED
+
+  const fetchRules = async () => {
+    try {
+      setLoading(true);
+      const res = await lateConfigurationAPI.getAll();
+      setRules(res.data);
+    } catch (err) {
+      Toast.error("Failed to fetch rules"); 
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createRule = async (data) => {
+    try {
+      const res = await lateConfigurationAPI.create(data);
+      Toast.success("Rule created successfully"); 
+      fetchRules();
+      return res.data;
+    } catch (err) {
+      Toast.error("Failed to create rule"); 
+      throw err;
+    }
+  };
+
+  const updateRule = async (id, data) => {
+    try {
+      const res = await lateConfigurationAPI.update(id, data);
+      Toast.success("Rule updated successfully"); 
+      fetchRules();
+      return res.data;
+    } catch (err) {
+      Toast.error("Failed to update rule"); 
+      throw err;
+    }
+  };
+
+  const deleteRule = async (id) => {
+    try {
+      await lateConfigurationAPI.delete(id);
+      Toast.success("Rule deleted"); 
+      fetchRules();
+    } catch (err) {
+      Toast.error("Failed to delete rule"); 
+      throw err;
+    }
+  };
+
+  useEffect(() => {
+    fetchRules();
+  }, []);
+
+  return {
+    rules,
+    loading,
+    fetchRules,
+    createRule,
     updateRule,
     deleteRule,
   };
