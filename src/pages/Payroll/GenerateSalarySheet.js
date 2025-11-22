@@ -1,265 +1,206 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Card, Row, Col, Select, message, Input } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { useToast } from '../../hooks/useToast';
-// import SharedModal from '../components/common/SharedModal/SharedModal';
-// import { useDepartments } from '../hooks/useDepartments';
-// import ConfirmModal from '../components/common/SharedModal/ConfirmModal';
-// import { useToast } from '../hooks/useToast';
+// src/pages/Payroll/GenerateSalarySheet.jsx
+import React, { useState } from "react";
+import {
+  Card,
+  Row,
+  Col,
+  DatePicker,
+  Select,
+  Button,
+  Table,
+  Avatar,
+  Tag,
+  Space,
+  message,
+} from "antd";
+import dayjs from "dayjs";
+import { useSalarySheet } from "../../hooks/payroll/useGenerateSalarySheet";
+import { useNavigate } from "react-router-dom";
+
 const { Option } = Select;
 
-
 const GenerateSalarySheet = () => {
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { Toast, contextHolder } = useToast();
+  const navigate = useNavigate();
 
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [selectedDept, setSelectedDept] = useState(null);
+  const {
+    rows,
+    loading,
+    pagination,
+    setPagination,
+    filters,
+    handleFilter,
+    generatePayslip,
+  } = useSalarySheet();
 
-  // added editingDept state
-  const [editingDept, setEditingDept] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(
+    filters.month ? dayjs(filters.month) : null
+  );
+  const [selectedStatus, setSelectedStatus] = useState(filters.status || "");
 
-  const [searchText, setSearchText] = useState('');
+  const formatMonth = (m) => (m ? dayjs(m).format("YYYY-MM") : "");
 
-
-
-//   const { departments, loading, error, refetch, addDepartment, updateDepartment, deleteDepartment } = useDepartments();
-
-
-  const handleAddDepartment = async (values) => {
-  if (editingDept) {
-    // await updateDepartment(editingDept.id, values, Toast);
-    
-  } else {
-    // await addDepartment(values);
-    Toast.success("Department added successfully");
-  }
-
-  setIsModalOpen(false);
-  setEditingDept(null);
-};
-
-//   const loadDepartments = async (page = currentPage, size = pageSize, search = searchText) => {
-//     const data = await refetch(page, size, search);
-//     if (data && data.count !== undefined) setTotal(data.count);
-//   };
-  const [total, setTotal] = useState(0);
-
-  // Fetch when page, size, or search changes
-//   useEffect(() => {
-//     loadDepartments(currentPage, pageSize, searchText);
-//   }, [currentPage, pageSize, searchText]);
-
-  const handleSearch = (value) => {
-    setSearchText(value.toLowerCase());
-    setCurrentPage(1); // reset to page 1
+  const onFilterClick = () => {
+    const month = formatMonth(selectedMonth);
+    handleFilter({ month, status: selectedStatus });
   };
 
+  const handleTableChange = (page, pageSize) => {
+    setPagination((p) => ({ ...p, current: page, pageSize }));
+  };
 
+  const handleGeneratePayslipClick = async (record) => {
+    try {
+      const month =
+        record.payment_month ?? formatMonth(selectedMonth) ?? filters.month;
+
+      const employeeId =
+        record.employee_id ?? record.user_id ?? record.id ?? null;
+
+      if (!employeeId) {
+        message.error("Employee ID not found.");
+        return;
+      }
+
+      const payslipId = await generatePayslip({ employee_id: employeeId, month });
+
+      if (payslipId) navigate(`/payslip/${payslipId}`);
+      else navigate("/payslip/generate", { state: { employee_id: employeeId, month } });
+    } catch (err) {}
+  };
 
   const columns = [
     {
-      title: 'S/L',
-      dataIndex: 'sl',
-      key: 'sl',
+      title: "S/L",
+      width: 70,
+      align: "center",
+      render: (_, __, index) =>
+        (pagination.current - 1) * pagination.pageSize + index + 1,
+    },
+    {
+      title: "Month",
+      dataIndex: "payment_month",
+      render: (v) => (v ? dayjs(v).format("YYYY-MM") : formatMonth(selectedMonth)),
+    },
+    {
+      title: "Photo",
       width: 80,
-      align: 'center',
-      render: (_, __, index) => index + 1, // ✅ auto index
-    },
-    {
-      title: 'Allowance Name',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
-    },
-     {
-      title: 'Allowance Type',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
-    },
-     {
-      title: 'Percentage of Basic',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
-    },
-     {
-      title: 'Limit Per Month',
-      dataIndex: 'Allowance Name',
-      key: 'Allowance Name',
-      align: 'left',
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      width: 120,
-      align: 'center',
       render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => handleEdit(record)}
-          />
-          <Button
-            type="primary"
-            danger
-            icon={<DeleteOutlined />}
-            size="small"
-            onClick={() => handleDelete(record)}
-          />
+        <Avatar style={{ backgroundColor: "#87d068" }}>
+          {(record.employee_name || "A").charAt(0).toUpperCase()}
+        </Avatar>
+      ),
+    },
+    {
+      title: "Employee Name",
+      dataIndex: "employee_name",
+    },
+    {
+      title: "Pay Grade",
+      dataIndex: "pay_grade",
+    },
+    {
+      title: "Basic Salary",
+      dataIndex: "basic_salary",
+      render: (v) => (v == null ? "-" : v),
+    },
+    {
+      title: "Gross Salary",
+      dataIndex: "gross_salary",
+      render: (v) => (v == null ? "-" : v),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      width: 120,
+      render: (s) => {
+        let color = "blue";
+        if (s === "Paid") color = "green";
+        else if (s === "Pending" || s === "Calculated" || s === "Unpaid") color = "gold";
+        return <Tag color={color}>{s}</Tag>;
+      },
+    },
+    {
+      title: "Action",
+      width: 180,
+      align: "center",
+      render: (_, record) => (
+        <Space>
+          <Button type="primary" onClick={() => handleGeneratePayslipClick(record)}>
+            Generate Payslip
+          </Button>
         </Space>
       ),
     },
   ];
 
-  const handleEdit = (record) => {
-    // record is table row. ensure it contains id & name
-    // setEditingDept({ id: record.id ?? record.key, name: record.name });
-    // setIsModalOpen(true);
-  };
-
-  const handleDelete = (record) => {
-    // console.log("Delete clicked for:", record);
-    // setSelectedDept(record);
-    // setIsConfirmOpen(true)
-  };
-//   const handleConfirmDelete = async () => {
-//     if (!selectedDept) return;
-//     try {
-//        await deleteDepartment(selectedDept.id);
-//     Toast.success(`Deleted: ${selectedDept.name}`);
-
-//     const result = await refetch(currentPage, pageSize, searchText);
-
-//     if (result?.results?.length === 0 && currentPage > 1) {
-//       const newPage = currentPage - 1;
-//       setCurrentPage(newPage);
-
-//       await refetch(newPage, pageSize, searchText);
-//     }
-//     } catch (error) {
-//       Toast.error('Failed to delete department')
-//       console.error(error);
-//     } finally {
-//       setIsConfirmOpen(false);
-//       setSelectedDept(null);
-//     }
-//   };
-
-//   const handleCancelDelete = () => {
-//     setIsConfirmOpen(false);
-//     setSelectedDept(null);
-//   };
-
-
-//   const handleAddNew = () => {
-//     setEditingDept(null);
-//     setIsModalOpen(true);
-//   };
-
-//   const pagination = {
-//     current: currentPage,
-//     pageSize: pageSize,
-//     total: total,
-//     showSizeChanger: true,
-//     showQuickJumper: true,
-//     showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-//     pageSizeOptions: ['10', '20', '50', '100'],
-//     onChange: (page, size) => {
-//       setCurrentPage(page);
-//       setPageSize(size);
-//     },
-//   };
+  const dataSource = (rows || []).map((r) => ({
+    key: r.payslip_id ?? r.employee_id ?? r.id,
+    ...r,
+  }));
 
   return (
-    <div style={{ padding: '24px' }}>
-      {contextHolder}
-      <Card
-        title="Allowance List"
-        extra={
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            // onClick={handleAddNew}
-          >
-            Add New Allowance
-          </Button>
-        }
-      >
-        <Row style={{ marginBottom: 16 }} align="middle" justify="space-between">
+    <div style={{ padding: 24 }}>
+      <Row justify="end" style={{ marginBottom: 12, gap: 8 }}>
+        <Button onClick={() => navigate("/salary/generate-bulk")}>
+          Generate Bulk Salary Sheet
+        </Button>
+
+        <Button onClick={() => navigate("/salary/generate")}>
+          Add Salary Sheet
+        </Button>
+      </Row>
+
+      <Card title="Generate Salary Sheet">
+        <Row gutter={12} style={{ marginBottom: 16 }} align="middle">
           <Col>
-            <span style={{ marginRight: 8 }}>Show</span>
-            <Select
-              value={pageSize}
-              onChange={(value) => setPageSize(value)}
-              style={{ width: 80, marginRight: 8 }}
-            >
-              <Option value={10}>10</Option>
-              <Option value={20}>20</Option>
-              <Option value={50}>50</Option>
-              <Option value={100}>100</Option>
-            </Select>
-            <span>entries</span>
-          </Col>
-          <Col>
-            <Input.Search
-              placeholder="Search Allowance..."
-              allowClear
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: 250 }}
+            <DatePicker
+              picker="month"
+              value={selectedMonth}
+              onChange={(v) => setSelectedMonth(v)}
+              allowClear={false}
             />
+          </Col>
+
+          <Col>
+            <Select
+              placeholder="Select Status"
+              style={{ width: 160 }}
+              value={selectedStatus}
+              onChange={(v) => setSelectedStatus(v)}
+              allowClear
+            >
+              <Option value="Paid">Paid</Option>
+              <Option value="Unpaid">Unpaid</Option>
+              <Option value="Pending">Pending</Option>
+              <Option value="Calculated">Calculated</Option>
+            </Select>
+          </Col>
+
+          <Col>
+            <Button type="primary" onClick={onFilterClick}>
+              Filter
+            </Button>
           </Col>
         </Row>
 
         <Table
           columns={columns}
-        //   dataSource={departments
-        //     .filter((d) => d.name.toLowerCase().includes(searchText))
-        //     .map((d, i) => ({
-        //       key: d.id || i,
-        //       id: d.id,
-        //       sl: i + 1,
-        //       name: d.name,
-        //     }))
-        //   }
-
-        //   loading={loading}
-        //   pagination={pagination}
-          size="middle"
+          dataSource={dataSource}
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            onChange: handleTableChange,
+            pageSizeOptions: ["10", "20", "50", "100"],
+          }}
+          rowKey={(r) => r.key}
           bordered
-          scroll={{ x: 400 }}
+          size="middle"
+          scroll={{ x: 1100 }}
         />
       </Card>
-      {/* {isModalOpen && (
-        <SharedModal
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          onSubmit={handleAddDepartment} //  pass the handler
-          editingDept={editingDept} // pass for prefill in modal
-          loading={loading}
-          fieldLabel={[
-            {
-              label: 'Department Name',
-              name: 'name',
-              isRequired: true,
-              component: <Input placeholder="Enter Department Name" size="large" />,
-            },
-          ]}
-        />
-      )}
-      <ConfirmModal
-        isOpen={isConfirmOpen}
-        title="Delete Department"
-        message={`Are you sure you want to delete "${selectedDept?.name}"?`}
-        onOk={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-      /> */}
-
     </div>
   );
 };
