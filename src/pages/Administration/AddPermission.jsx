@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, Button, Space, Card, Row, Col, Select, message, Input, Checkbox, Tree } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, ClockCircleOutlined, SettingOutlined, DashboardOutlined, BarChartOutlined, CalendarOutlined, ScheduleOutlined, FileTextOutlined, DollarOutlined, MinusOutlined, UserOutlined, CheckOutlined, GiftOutlined, ApartmentOutlined, SafetyCertificateOutlined, UserAddOutlined, ReadOutlined, TrophyOutlined, NotificationOutlined, ProfileOutlined, CalculatorOutlined, CheckCircleOutlined, RiseOutlined, WarningOutlined, TeamOutlined, BankOutlined, UnlockOutlined, KeyOutlined } from '@ant-design/icons';
 import { useToast } from '../../hooks/useToast';
 import { usePages } from '../../hooks/pages/usePages';
 import { useAddRoles } from '../../hooks/useAddRole';
@@ -8,14 +7,11 @@ import { getIconComponent } from '../../constants/menuItem';
 
 const { Option } = Select;
 
-// Icon mapping function
-
-
 const AddPermission = () => {
   const [selectedRoleId, setSelectedRoleId] = useState(null);
   const [checkedKeys, setCheckedKeys] = useState([]);
   const { Toast, contextHolder } = useToast();
-  const { loading: pagesLoading, allPages, allowedPages, error, updateRolePermission,fetchPagesByRole } = usePages();
+  const { loading: pagesLoading, allPages, allowedPages, error, updateRolePermission, fetchPagesByRole } = usePages();
   const { roles } = useAddRoles();
 
   // Transform API data to match our component structure
@@ -36,16 +32,21 @@ const AddPermission = () => {
     return transformItems(allPages);
   }, [allPages]);
 
-  // Get all leaf node keys (actual permissions)
+  // Get ONLY leaf nodes (actual pages, not modules/folders)
   const getAllLeafKeys = useMemo(() => {
     const leafKeys = new Set();
     
     const extractLeafKeys = (items) => {
       items.forEach(item => {
         if (item.children && item.children.length > 0) {
+          // This has children, so it's a folder/module - skip it and check children
           extractLeafKeys(item.children);
         } else {
-          leafKeys.add(item.key);
+          // This is a leaf node (actual page) - only add if it's a page (not a module)
+          // Check if this is an actual page by looking at URL pattern or ID range
+          if (item.id && item.id >= 55) { // Page IDs start from 55 in your data
+            leafKeys.add(item.key);
+          }
         }
       });
     };
@@ -54,24 +55,7 @@ const AddPermission = () => {
     return Array.from(leafKeys);
   }, [transformedMenuItems]);
 
-  // Get all keys including parent keys
-  const getAllKeys = (items = transformedMenuItems) => {
-    let keys = [];
-    
-    const extractKeys = (menuItems) => {
-      menuItems.forEach(item => {
-        keys.push(item.key);
-        if (item.children && item.children.length > 0) {
-          extractKeys(item.children);
-        }
-      });
-    };
-    
-    extractKeys(items);
-    return keys;
-  };
-
-  // Get all leaf keys for a specific module
+  // Get leaf keys for a specific module (only actual pages)
   const getModuleLeafKeys = (module) => {
     const leafKeys = [];
     
@@ -80,7 +64,10 @@ const AddPermission = () => {
         if (item.children && item.children.length > 0) {
           extractLeafKeys(item.children);
         } else {
-          leafKeys.push(item.key);
+          // Only add if it's an actual page (ID >= 55)
+          if (item.id && item.id >= 55) {
+            leafKeys.push(item.key);
+          }
         }
       });
     };
@@ -89,7 +76,7 @@ const AddPermission = () => {
     return leafKeys;
   };
 
-  // Function to find key by page ID in menu items
+  // Function to find key by page ID
   const findKeyByPageId = (pageId, items = transformedMenuItems) => {
     for (let item of items) {
       if (item.id === pageId) {
@@ -98,6 +85,20 @@ const AddPermission = () => {
       if (item.children && item.children.length > 0) {
         const foundKey = findKeyByPageId(pageId, item.children);
         if (foundKey) return foundKey;
+      }
+    }
+    return null;
+  };
+
+  // Function to find page ID by key - WITH VALIDATION
+  const findPageIdByKey = (key, items = transformedMenuItems) => {
+    for (let item of items) {
+      if (item.key === key && item.id && item.id >= 55) { // Only return valid page IDs
+        return item.id;
+      }
+      if (item.children && item.children.length > 0) {
+        const foundId = findPageIdByKey(key, item.children);
+        if (foundId) return foundId;
       }
     }
     return null;
@@ -118,21 +119,11 @@ const AddPermission = () => {
   // Handle role selection
   const handleRoleChange = async (roleId) => {
     setSelectedRoleId(roleId);
-    fetchPagesByRole(roleId)
     if (roleId) {
       try {
-        // Check if we have allowedPages data for this role
-        if (allowedPages && allowedPages.role_id === roleId) {
-          const assignedPageIds = allowedPages.assigned_page_ids || [];
-          const checkedKeysFromBackend = convertPageIdsToCheckedKeys(assignedPageIds);
-          setCheckedKeys(checkedKeysFromBackend);
-        } else {
-          // If no data found for this role, clear checked keys
-          setCheckedKeys([]);
-          message.info('No permissions found for this role');
-        }
+        await fetchPagesByRole(roleId);
       } catch (error) {
-        message.error('Failed to fetch permissions');
+        message.error('Failed to fetch role permissions');
         console.error('Error fetching permissions:', error);
       }
     } else {
@@ -166,12 +157,10 @@ const AddPermission = () => {
     let newCheckedKeys = [...checkedKeys];
     
     if (checked) {
-      // Add the key if not already present
       if (!newCheckedKeys.includes(key)) {
         newCheckedKeys.push(key);
       }
     } else {
-      // Remove the key
       newCheckedKeys = newCheckedKeys.filter(k => k !== key);
     }
     
@@ -193,31 +182,51 @@ const AddPermission = () => {
     }
   };
 
-  // Handle select all
+  // Handle select all - WITH VALIDATION
   const handleSelectAll = () => {
-    setCheckedKeys(getAllLeafKeys);
+  const allLeafKeys = getAllLeafKeys;
+  
+  // Find parent pages that are needed for module structure
+  const necessaryParentPages = new Set();
+  
+  const findNecessaryParents = (items) => {
+    items.forEach(item => {
+      if (item.children && item.children.length > 0) {
+        // Check if any child is selected
+        const hasSelectedChild = item.children.some(child => 
+          allLeafKeys.includes(child.key)
+        );
+        
+        if (hasSelectedChild && item.id && item.id >= 55) {
+          necessaryParentPages.add(item.key);
+        }
+        
+        // Recursively check children
+        findNecessaryParents(item.children);
+      }
+    });
   };
+  
+  findNecessaryParents(transformedMenuItems);
+  
+  // Combine leaf keys with necessary parent pages
+  const allKeysToSelect = [...new Set([...allLeafKeys, ...necessaryParentPages])];
+  
+  console.log('Selecting all keys:', {
+    leafKeys: allLeafKeys,
+    necessaryParents: Array.from(necessaryParentPages),
+    finalSelection: allKeysToSelect
+  });
+  
+  setCheckedKeys(allKeysToSelect);
+};
 
   // Handle deselect all
   const handleDeselectAll = () => {
     setCheckedKeys([]);
   };
 
-  // Function to find page ID by key
-  const findPageIdByKey = (key, items = transformedMenuItems) => {
-    for (let item of items) {
-      if (item.key === key) {
-        return item.id;
-      }
-      if (item.children && item.children.length > 0) {
-        const foundId = findPageIdByKey(key, item.children);
-        if (foundId) return foundId;
-      }
-    }
-    return null;
-  };
-
-  // Save permissions
+  // Save permissions - WITH ENHANCED VALIDATION
   const handleSavePermissions = async () => {
     if (!selectedRoleId) {
       message.warning('Please select a role first');
@@ -225,17 +234,37 @@ const AddPermission = () => {
     }
 
     try {
-      // Convert checked keys back to page IDs
-      const selectedPageIds = checkedKeys.map(key => findPageIdByKey(key)).filter(id => id !== null);
-      
+      // Convert checked keys back to page IDs with strict validation
+      const selectedPageIds = checkedKeys
+        .map(key => findPageIdByKey(key))
+        .filter(id => id !== null && id !== undefined && id >= 55) // Only valid page IDs
+        .map(id => Number(id));
+
       console.log('Saving permissions for role:', selectedRoleId);
-      console.log('Selected Page IDs:', selectedPageIds);
       console.log('Selected Keys:', checkedKeys);
-      
+      console.log('Selected Page IDs (valid only):', selectedPageIds);
+
+      // Additional validation
+      const invalidKeys = checkedKeys.filter(key => {
+        const pageId = findPageIdByKey(key);
+        return pageId === null || pageId < 55;
+      });
+
+      if (invalidKeys.length > 0) {
+        console.warn('Invalid keys filtered out:', invalidKeys);
+      }
+
+      if (selectedPageIds.length === 0) {
+        message.warning('Please select at least one valid permission');
+        return;
+      }
+
+      // Final payload validation
+      console.log('Final Payload to Send:', { page_ids: selectedPageIds });
+
       // Call API to update permissions
-      await updateRolePermission(selectedRoleId, { page_ids: selectedPageIds });
+      await updateRolePermission(selectedRoleId, { page_ids: selectedPageIds }, Toast);
       
-      message.success('Permissions updated successfully');
     } catch (error) {
       message.error('Failed to update permissions');
       console.error('Error updating permissions:', error);
@@ -277,19 +306,6 @@ const AddPermission = () => {
     return groups;
   }, [transformedMenuItems]);
 
-  // Show loading while fetching pages
-  if (pagesLoading) {
-    return (
-      <div style={{ padding: '24px', textAlign: 'center' }}>
-        <Card>
-          <div style={{ padding: '40px' }}>
-            Loading menu items...
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div style={{ padding: '24px' }}>
       {contextHolder}
@@ -297,9 +313,14 @@ const AddPermission = () => {
         title="Role Permission Management"
         extra={
           <Space>
-            <Button onClick={handleSelectAll}>Select All</Button>
-            <Button onClick={handleDeselectAll}>Deselect All</Button>
-            <Button type="primary" onClick={handleSavePermissions}>
+            <Button disabled={!selectedRoleId} onClick={handleSelectAll}>Select All</Button>
+            <Button disabled={!selectedRoleId} onClick={handleDeselectAll}>Deselect All</Button>
+            <Button 
+              disabled={!selectedRoleId} 
+              loading={pagesLoading} 
+              type="primary" 
+              onClick={handleSavePermissions}
+            >
               Save Permissions
             </Button>
           </Space>

@@ -191,7 +191,6 @@ const MainLayout = () => {
   const formattedRole = formatRole(role);
   const displayName = getFullName() || 'User';
 
-  // Agar user data loading hai to loading show karein
   if (!user) {
     return (
       <div style={{ 

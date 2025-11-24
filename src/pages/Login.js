@@ -39,8 +39,7 @@ const Login = () => {
       Toast.success("Login Successfully")
 
     } catch (error) {
-      console.log(error,"error")
-      Toast.error(error?.detail || "Something went wrong")
+      Toast.error(error)
     }
 
   };

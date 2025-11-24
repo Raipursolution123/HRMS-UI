@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { API_BASE_URL, API_TIMEOUT, HTTP_STATUS } from '../constants/apiConstants';
 import { STORAGE_KEYS } from '../constants/appConstants';
-
+import store from '../store';
+import { logout } from '../store/slices/authSlice';
 const API = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
@@ -75,6 +76,12 @@ API.interceptors.response.use(
     // ✅ Handle other errors
     if (response?.status === HTTP_STATUS.UNAUTHORIZED) {
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      localStorage.removeItem('hrms_access_token');
+      localStorage.removeItem('hrms_refresh_token');
+      
+      // Redux store se logout dispatch karein
+      store.dispatch(logout());
+      
       // window.location.href = '/login'; // Temporary comment
     }
     

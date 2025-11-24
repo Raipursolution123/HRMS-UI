@@ -40,16 +40,19 @@ export const usePages = () => {
       setLoading(false);
     }
   };
-  const updateRolePermission = async (roleId,selectedPages) => {
+  const updateRolePermission = async (roleId,selectedPages,Toast) => {
     setLoading(true);
     setError(null);
     try {
       const response = await pagesServicesAPI.updateRolePermission(roleId,selectedPages);
-      console.log(response,'responseresponse');
+      console.log(response?.data?.message,'responseresponse');
+      Toast.success(response?.data?.message)
       
       fetchPagesByRole(roleId);
       return response?.data; 
     } catch (err) {
+        console.log(err,'errerrerrerrerr');
+      Toast.error("something went wrong")
       setError(err.response?.data?.message || 'Failed to fetch roles');
       return null;
     } finally {
