@@ -1,248 +1,147 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Button,
-  Space,
   Card,
-  Row,
-  Col,
   Select,
-  Input,
   InputNumber,
   Form,
-  Tag,
 } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  SaveOutlined,
-  CloseOutlined,
-} from "@ant-design/icons";
-
 import { useLateConfiguration } from "../../../hooks/payroll/useLateConfiguration";
 import { useToast } from "../../../hooks/useToast";
-import ConfirmModal from "../../../components/common/SharedModal/ConfirmModal";
 
 const { Option } = Select;
 
 const LateConfiguration = () => {
-  const { Toast, contextHolder } = useToast(); // FIXED
+  const { Toast,contextHolder } = useToast();
 
   const {
     rules,
     loading,
     createRule,
     updateRule,
-    deleteRule,
+    fetchRules,
   } = useLateConfiguration();
 
-  const [searchText, setSearchText] = useState("");
-  const [editingId, setEditingId] = useState(null);
   const [form] = Form.useForm();
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentRuleId, setCurrentRuleId] = useState(null);
 
-  const filteredData = rules.filter(
-    (item) =>
-      item.status.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.late_days_threshold.toString().includes(searchText) ||
-      item.deduction_days.toString().includes(searchText)
-  );
+  // Load the first rule into the form when rules are fetched
+  useEffect(() => {
+    if (rules && rules.length > 0) {
+      const firstRule = rules[0];
+      setCurrentRuleId(firstRule.id);
+      form.setFieldsValue({
+        late_days_threshold: firstRule.late_days_threshold,
+        deduction_days: firstRule.deduction_days,
+        status: firstRule.status,
+      });
+    } else {
+      setCurrentRuleId(null);
+      form.resetFields();
+    }
+  }, [rules, form]);
+
+  const handleUpdate = async () => {
+    try {
+      const values = await form.validateFields();
+
+      if (currentRuleId) {
+        await updateRule(currentRuleId, values);
+        Toast.success("Succesfully Updated")
+      } else {
+        await createRule(values);
+        Toast.success("Succesfully Created")
+      }
+      await fetchRules();
+    } catch (error) {
+      console.error("Update failed:", error);
+      Toast.error("Failed to Update")
+    }
+  };
+
+  // We only show one row. 
+  const dataSource = [{ key: '1' }];
 
   const columns = [
     {
       title: "S/L",
       align: "center",
       width: 70,
-      render: (_, __, index) =>
-        (currentPage - 1) * pageSize + index + 1,
+      render: () => 1,
     },
     {
       title: "For Days",
-      dataIndex: "late_days_threshold",
       align: "center",
-      render: (text, record) =>
-        editingId === record.id ? (
-          <Form.Item
-            name="late_days_threshold"
-            style={{ margin: 0 }}
-            rules={[{ required: true, message: "Enter days" }]}
-          >
-            <InputNumber min={1} max={31} style={{ width: "100%" }} />
-          </Form.Item>
-        ) : (
-          <span>{text} days</span>
-        ),
+      render: () => (
+        <Form.Item
+          name="late_days_threshold"
+          style={{ margin: 0 }}
+          rules={[{ required: true, message: "Required" }]}
+        >
+          <InputNumber min={1} max={31} style={{ width: "100%" }} placeholder="e.g. 3" />
+        </Form.Item>
+      ),
     },
     {
       title: "Day of Salary Deduction",
-      dataIndex: "deduction_days",
       align: "center",
-      render: (text, record) =>
-        editingId === record.id ? (
-          <Form.Item
-            name="deduction_days"
-            style={{ margin: 0 }}
-            rules={[{ required: true, message: "Enter deduction days" }]}
-          >
-            <InputNumber min={0.5} max={31} step={0.5} style={{ width: "100%" }} />
-          </Form.Item>
-        ) : (
-          <span>{text} day</span>
-        ),
+      render: () => (
+        <Form.Item
+          name="deduction_days"
+          style={{ margin: 0 }}
+          rules={[{ required: true, message: "Required" }]}
+        >
+          <InputNumber min={0} max={31} step={0.5} style={{ width: "100%" }} placeholder="e.g. 1" />
+        </Form.Item>
+      ),
     },
     {
       title: "Status",
-      dataIndex: "status",
       align: "center",
-      render: (text, record) =>
-        editingId === record.id ? (
-          <Form.Item name="status" style={{ margin: 0 }}>
-            <Select style={{ width: "100%" }}>
-              <Option value="Active">Active</Option>
-              <Option value="Inactive">Inactive</Option>
-            </Select>
-          </Form.Item>
-        ) : (
-          <Tag color={text === "Active" ? "green" : "red"}>{text}</Tag>
-        ),
+      render: () => (
+        <Form.Item name="status" style={{ margin: 0 }} initialValue="Active">
+          <Select style={{ width: "100%" }}>
+            <Option value="Active">Active</Option>
+            <Option value="Inactive">Inactive</Option>
+          </Select>
+        </Form.Item>
+      ),
     },
     {
-      title: "Actions",
+      title: "Update",
       align: "center",
-      width: 200,
-      render: (_, record) =>
-        editingId === record.id ? (
-          <Space>
-            <Button
-              type="primary"
-              icon={<SaveOutlined />}
-              size="small"
-              loading={loading}
-              onClick={() => handleSave(record)}
-            >
-              Save
-            </Button>
-            <Button
-              icon={<CloseOutlined />}
-              size="small"
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
-          </Space>
-        ) : (
-          <Space>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              size="small"
-              onClick={() => handleEdit(record)}
-              className="table-page-edit-btn"
-            >
-              Edit
-            </Button>
-
-            <ConfirmModal
-              title="Delete Rule?"
-              message="Are you sure you want to delete this rule?"
-              onConfirm={() => deleteRule(record.id)}
-              buttonText="Delete"
-              icon={<DeleteOutlined />}
-            />
-          </Space>
-        ),
+      width: 120,
+      render: () => (
+        <Button
+          type="primary"
+          style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+          onClick={handleUpdate}
+          loading={loading}
+        >
+          Update
+        </Button>
+      ),
     },
   ];
 
-  const handleEdit = (record) => {
-    setEditingId(record.id);
-    form.setFieldsValue({
-      late_days_threshold: record.late_days_threshold,
-      deduction_days: record.deduction_days,
-      status: record.status,
-    });
-  };
-
-  const handleSave = async (record) => {
-    const values = await form.validateFields();
-    await updateRule(record.id, values);
-    setEditingId(null);
-  };
-
-  const handleCancel = () => {
-    setEditingId(null);
-    form.resetFields();
-  };
-
-  const handleAdd = async () => {
-    const newRule = await createRule({
-      late_days_threshold: 1,
-      deduction_days: 1,
-      status: "Active",
-    });
-
-    setEditingId(newRule.id);
-
-    form.setFieldsValue({
-      late_days_threshold: newRule.late_days_threshold,
-      deduction_days: newRule.deduction_days,
-      status: newRule.status,
-    });
-  };
-
   return (
     <div className="table-page-container">
-      {contextHolder} {/* IMPORTANT for notifications */}
+      {contextHolder}
 
       <Card
         className="table-page-card"
         title="Rules of Salary Deduction"
-        extra={
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            disabled={editingId !== null}
-            onClick={handleAdd}
-            className="table-page-add-btn"
-          >
-            Add New Rule
-          </Button>
-        }
       >
-        <Row className="table-page-filters" justify="space-between">
-          <Col>
-            <Input.Search
-              placeholder="Search..."
-              className="table-page-search"
-              style={{ width: 300 }}
-              allowClear
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
-          </Col>
-        </Row>
-
         <Form form={form} component={false}>
           <div className="table-page-table">
             <Table
               columns={columns}
               loading={loading}
-              dataSource={filteredData}
-              rowKey="id"
+              dataSource={dataSource}
+              rowKey="key"
               bordered
-              pagination={{
-                current: currentPage,
-                pageSize,
-                onChange: (page, size) => {
-                  setCurrentPage(page);
-                  setPageSize(size);
-                },
-                showSizeChanger: true,
-                pageSizeOptions: ['10', '20', '50', '100'],
-                showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-              }}
+              pagination={false}
             />
           </div>
         </Form>

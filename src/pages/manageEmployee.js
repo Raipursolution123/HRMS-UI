@@ -264,3 +264,316 @@ const deleteModal = {
 };
 
 export default ManageEmployee;
+
+/*import React, { useState, useRef } from 'react';
+import { Avatar, Tag, Space, Button, Card, Row, Col, Input, Select, Table } from 'antd';
+import { useManageEmployee } from '../hooks/useManageEmployee';
+import { useNavigate } from 'react-router-dom';
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
+import { useToast } from '../hooks/useToast';
+import ConfirmModal from '../components/common/SharedModal/ConfirmModal';
+
+const { Option } = Select;
+const { Search } = Input;
+
+const ManageEmployee = () => {
+    const navigate = useNavigate();
+    const [isOpenModal, setIsOpenModal] = useState(false);
+    const [deleteId, setDeleteId] = useState();
+
+    const { employees, deleteEmployee, filters, setFilters, pagination, setPagination } = useManageEmployee();
+    const { Toast, contextHolder } = useToast();
+    const searchTimeout = useRef(null);
+
+    // Job status color mapping
+    const getStatusColor = (status) => {
+        const statusColors = {
+            'Permanent': 'green',
+            'Probation Period': 'orange',
+            'Intern': 'blue'
+        };
+        return statusColors[status] || 'default';
+    };
+
+    const handleEdit = (id) => {
+        navigate(`edit/${id}`)
+    };
+    const handleDelete = (id) => {
+        setDeleteId(id);
+        setIsOpenModal(true);
+    };
+    const handleView = (id) => {
+        navigate(`profile/${id}`)
+    }
+    const handleEmptyData = (data) => (data || "--")
+
+    // Employee columns
+    const employeeColumns = [
+        {
+            title: 'Serial',
+            dataIndex: 'user_id',
+            key: 'user_id',
+            width: 70,
+            align: 'center',
+            render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
+        },
+        {
+            title: 'Employee',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text, record) => (
+                <Space>
+                    <Avatar
+                        size="large"
+                        style={{ backgroundColor: '#1890ff' }}
+                    >
+                        {text ? text.charAt(0).toUpperCase() : 'U'}
+                    </Avatar>
+                    <div>
+                        <div style={{ fontWeight: 'bold' }}>{text}</div>
+                        <div style={{ color: '#666', fontSize: '12px' }}>
+                            Role: {handleEmptyData(record.role)}
+                        </div>
+                        {record.supervisor && record.supervisor !== 'N/A' && (
+                            <div style={{ color: '#666', fontSize: '12px' }}>
+                                Supervisor: {handleEmptyData(record.supervisor)}
+                            </div>
+                        )}
+                    </div>
+                </Space>
+            ),
+        },
+        {
+            title: 'Department',
+            dataIndex: 'department',
+            key: 'department',
+            render: (text, record) => (
+                <Space direction="vertical" size={0}>
+                    <div style={{ fontWeight: 'bold' }}>{text}</div>
+                    <div style={{ color: '#666', fontSize: '12px' }}>
+                        Designation: {handleEmptyData(record.designation)}
+                    </div>
+                    {record.supervisor && record.supervisor !== 'N/A' && (
+                        <div style={{ color: '#666', fontSize: '12px' }}>
+                            Branch Name: {handleEmptyData(record?.branch)}
+                        </div>
+                    )}
+                </Space>
+            ),
+        },
+        {
+            title: 'Phone',
+            dataIndex: 'phone',
+            key: 'phone',
+        },
+        {
+            title: 'Fingerprint/Emp No.',
+            dataIndex: 'employee_id',
+            key: 'employee_id',
+        },
+        {
+            title: 'Pay Grade',
+            dataIndex: 'pay_grade',
+            key: 'pay_grade',
+        },
+        {
+            title: 'Date of Joining',
+            dataIndex: 'date_of_joining',
+            key: 'date_of_joining',
+            render: (text, record) => (
+                <Space direction="vertical" size={0}>
+                    <div>{text}</div>
+                    <div style={{ color: '#666', fontSize: '12px' }}>
+                        {record.joiningDuration}
+                    </div>
+                    <div style={{ color: '#666', fontSize: '12px' }}>
+                        Job Status: {handleEmptyData(record.job_status)}
+                    </div>
+                </Space>
+            ),
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            align: 'center',
+            render: (status) => (
+                <Tag color={getStatusColor(status)}>
+                    {status}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            width: 150,
+            align: 'center',
+            render: (_, record) => (
+                <Space size="small">
+                    <Button
+                        className="table-action-btn table-action-btn-view"
+                        icon={<EyeOutlined />}
+                        size="small"
+                        onClick={() => handleView(record?.user_id)}
+                    />
+                    <Button
+                        className="table-action-btn table-action-btn-edit"
+                        icon={<EditOutlined />}
+                        size="small"
+                        onClick={() => handleEdit(record?.user_id)}
+                    />
+                    <Button
+                        className="table-action-btn table-action-btn-delete"
+                        danger
+                        icon={<DeleteOutlined />}
+                        size="small"
+                        onClick={() => handleDelete(record?.user_id)}
+                    />
+                </Space>
+            ),
+        },
+    ];
+
+    // Filter options
+    const employeeFilters = [
+        {
+            key: 'department',
+            placeholder: '--- Select Department ---',
+            options: [
+                { value: 'engineering', label: 'Engineering' },
+                { value: 'hr', label: 'Human Resource' },
+                { value: 'networking', label: 'Networking' }
+            ]
+        },
+        {
+            key: 'designation',
+            placeholder: '--- Select Designation ---',
+            options: [
+                { value: 'software_engineer', label: 'Software Engineer' },
+                { value: 'director', label: 'Director' },
+                { value: 'executive', label: 'S/ Executive' }
+            ]
+        },
+        {
+            key: 'role',
+            placeholder: '--- Please Select ---',
+            options: [
+                { value: 'employee', label: 'Employee' },
+                { value: 'manager', label: 'Manager' },
+                { value: 'admin', label: 'Admin' }
+            ]
+        }
+    ];
+
+    const handleSearch = (value) => {
+        if (searchTimeout.current) clearTimeout(searchTimeout.current);
+
+        searchTimeout.current = setTimeout(() => {
+            setFilters(prev => ({ ...prev, search: value }));
+            setPagination(prev => ({ ...prev, current: 1 })); // reset page
+        }, 300); // 300ms debounce
+    };
+
+    const handleFilterChange = (filterKey, value) => {
+        // Map filterKey to hook filters
+        const keyMap = {
+            department: 'department_id',
+            designation: 'designation_id',
+            role: 'role'
+        };
+
+        const apiKey = keyMap[filterKey] || filterKey;
+
+        setFilters(prev => ({ ...prev, [apiKey]: value }));
+        setPagination(prev => ({ ...prev, current: 1 })); // Reset page
+    };
+
+    const handleDeleteModal = () => {
+        deleteEmployee(deleteId, Toast)
+        setIsOpenModal(false);
+    }
+
+    const handleDeleteCancel = () => {
+        setIsOpenModal(false)
+    }
+
+    return (
+        <div className="table-page-container">
+            {contextHolder}
+            <Card
+                className="table-page-card"
+                title="Employee List"
+                extra={
+                    <Button
+                        type="primary"
+                        className="table-page-add-btn"
+                        icon={<PlusOutlined />}
+                        onClick={() => navigate('create')}
+                    >
+                        Add Employee
+                    </Button>
+                }
+            >
+                <Row className="table-page-filters" gutter={[16, 16]} align="middle" justify="space-between">
+                    <Col flex="auto">
+                        <Row gutter={[16, 16]}>
+                            {employeeFilters.map((filter) => (
+                                <Col key={filter.key}>
+                                    <Select
+                                        placeholder={filter.placeholder}
+                                        className="table-page-select"
+                                        style={{ width: 200 }}
+                                        allowClear
+                                        onChange={(val) => handleFilterChange(filter.key, val)}
+                                    >
+                                        {filter.options.map(opt => (
+                                            <Option key={opt.value} value={opt.value}>{opt.label}</Option>
+                                        ))}
+                                    </Select>
+                                </Col>
+                            ))}
+                        </Row>
+                    </Col>
+                    <Col>
+                        <Search
+                            placeholder="Search By Employee Name"
+                            allowClear
+                            onSearch={handleSearch}
+                            className="table-page-search"
+                            style={{ width: 250 }}
+                        />
+                    </Col>
+                </Row>
+
+                <div className="table-page-table">
+                    <Table
+                        columns={employeeColumns}
+                        dataSource={employees}
+                        rowKey="user_id"
+                        pagination={{
+                            ...pagination,
+                            onChange: (page, pageSize) => setPagination(prev => ({ ...prev, current: page, pageSize })),
+                            showSizeChanger: true,
+                            showTotal: (total, range) => `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                        }}
+                        bordered
+                        size="middle"
+                        scroll={{ x: true }}
+                    />
+                </div>
+            </Card>
+
+            <ConfirmModal
+                isOpen={isOpenModal}
+                title="Delete Employee?"
+                message="This Profile will be Deleted"
+                onConfirm={handleDeleteModal}
+                onCancel={handleDeleteCancel}
+                icon={<DeleteOutlined />}
+                buttonText="Delete"
+            />
+        </div>
+    );
+};
+
+export default ManageEmployee;*/

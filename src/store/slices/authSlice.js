@@ -6,15 +6,33 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await authAPI.login(credentials);
-      return response.data; 
+      return response.data;
     } catch (error) {
       console.log(error.response?.data?.detail || error.message, 'Login Error');
-      
+
       return rejectWithValue(
-        error.response?.data?.detail || 
-        error.message || 
+        error.response?.data?.detail ||
+        error.message ||
         'Login failed'
       );
+    }
+  }
+);
+
+export const signup = createAsyncThunk(
+  'auth/signup',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.signup(userData);
+      return response.data;
+    } catch (error) {
+      console.log(error.response?.data?.detail || error.message, 'Signup Error');
+      // Look for field-specific errors if available, otherwise general detail
+      const errorMessage = error.response?.data?.detail ||
+        (error.response?.data ? JSON.stringify(error.response.data) : null) ||
+        error.message ||
+        'Signup failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -68,6 +86,21 @@ const authSlice = createSlice({
         localStorage.setItem('hrms_refresh_token', action.payload.refresh);
       })
       .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(signup.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(signup.fulfilled, (state, action) => {
+        state.loading = false;
+        // state.user = action.payload.user;
+        // state.accessToken = action.payload.tokens?.access;
+        // state.refreshToken = action.payload.tokens?.refresh;
+        // state.isAuthenticated = true;
+      })
+      .addCase(signup.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

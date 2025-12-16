@@ -13,6 +13,7 @@ import LandingNavbar from './components/landing/Navbar';
 import LandingFooter from './components/landing/Footer';
 import { theme as landingTheme } from './pages/landing/theme';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Department from './pages/Department';
@@ -193,6 +194,7 @@ function App() {
             } />
 
             {/* App Routes (Protected) */}
+            <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/app" element={
               <ProtectedRoute>

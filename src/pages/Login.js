@@ -3,11 +3,11 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Card, message, Typography, Image } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, HomeOutlined } from '@ant-design/icons';
 import { login, clearError } from '../store/slices/authSlice';
 import logo from '../assets/images/logo.svg';
 import { useToast } from '../hooks/useToast';
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -53,6 +53,20 @@ const Login = () => {
         backgroundColor: '#e6e9ff',
       }}
     >
+      <Button
+        type="text"
+        icon={<HomeOutlined />}
+        onClick={() => navigate('/')}
+        style={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          fontWeight: 600,
+          color: '#333'
+        }}
+      >
+        Back to Home
+      </Button>
       {contextHolder}
       <Card
         style={{
@@ -135,6 +149,16 @@ const Login = () => {
             </Button>
           </Form.Item>
         </Form>
+        <div style={{ textAlign: 'center', marginTop: 15 }}>
+          <Text>If you don't have an account? </Text>
+          <Button
+            type="link"
+            onClick={() => navigate('/signup')}
+            style={{ padding: 0, fontWeight: 600, color: '#6f53e1' }}
+          >
+            Sign Up
+          </Button>
+        </div>
       </Card>
     </div>
   );
