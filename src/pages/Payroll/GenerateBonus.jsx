@@ -44,7 +44,7 @@ const GenerateBonus = () => {
   };
 
   const handleAddBonus = () => {
-    navigate('/payroll/add-generate-bonus');
+    navigate('/app/payroll/add-generate-bonus');
   };
 
   // Payment Handlers

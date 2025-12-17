@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Card, message, Typography, Image } from 'antd';
 import { UserOutlined, LockOutlined, HomeOutlined } from '@ant-design/icons';
 import { login, clearError } from '../store/slices/authSlice';
+import { authAPI } from '../services/authServices';
 import logo from '../assets/images/logo.svg';
 import { useToast } from '../hooks/useToast';
 const { Title, Text } = Typography;
@@ -18,12 +19,7 @@ const Login = () => {
 
 
   useEffect(() => {
-    if (isAuthenticated) {
-      setTimeout(() => {
-        navigate('/app');
-
-      }, [300])
-    }
+    // Navigation is now handled in onFinish after role check
   }, [isAuthenticated, navigate]);
 
   // useEffect(() => {
@@ -36,9 +32,53 @@ const Login = () => {
   const onFinish = async (values) => {
     try {
       const result = await dispatch(login(values)).unwrap();
-      Toast.success("Login Successfully")
+
+      // Fetch user profile to check role
+      try {
+        const { data: profile } = await authAPI.getProfile();
+
+        // Check if role is Super Admin
+        //console.log("Fetched Profile:", profile);
+        //console.log("Role Name RAW:", profile?.role?.name);
+
+        const roleName = profile?.role?.name?.trim();
+        //console.log("Role Name TRIMMED:", roleName);
+
+        if (roleName === "Super Admin") {
+          //console.log("MATCH! Redirecting to Super Admin Portal...");
+          message.success("Login Successful. Redirecting to Super Admin Portal...");
+          // Redirect to Super Admin UI on port 3001 with tokens
+          // Fix: Tokens are likely at the root of result based on authSlice
+          const access = result.access || result.tokens?.access;
+          const refresh = result.refresh || result.tokens?.refresh;
+
+          //console.log("Tokens found:", { access, refresh });
+
+          if (access && refresh) {
+            window.location.href = `http://localhost:3001?access=${access}&refresh=${refresh}`;
+            return;
+          } else {
+            //console.error("Tokens missing in login response:", result);
+            message.error("Failed to retrieve authentication tokens.");
+            // Fallback or halt? If super admin, we probably shouldn't go to /app if it fails.
+            // But to avoid dead end, maybe just let it fail naturally or stay on page.
+            return;
+          }
+        } else {
+          console.log("NO MATCH. Redirecting to /app...");
+          Toast.success("Login Successfully");
+          setTimeout(() => {
+            navigate('/app');
+          }, 300);
+        }
+      } catch (profileError) {
+        console.error("Failed to fetch profile:", profileError);
+        // Fallback to default app if profile fetch fails
+        navigate('/app');
+      }
 
     } catch (error) {
+      console.log("Login Dispatch Error:", error);
       Toast.error(error)
     }
 

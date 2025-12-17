@@ -117,7 +117,7 @@ const AddGenerateBonus = () => {
 
 
       setTimeout(() => {
-        navigate('/payroll/manage-bonus/generate-bonus');
+        navigate('/app/payroll/manage-bonus/generate-bonus');
       }, 1500);
 
     } catch (error) {

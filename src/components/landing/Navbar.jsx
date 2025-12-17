@@ -14,7 +14,7 @@ const Navbar = () => {
     { key: 'home', label: 'Home' },
     { key: 'pricing', label: 'Pricing' },
     { key: 'support', label: 'Support' },
-    { key: 'requirements', label: 'Job Requirements' },
+    //{ key: 'requirements', label: 'Job Requirements' },
   ];
 
   return (
