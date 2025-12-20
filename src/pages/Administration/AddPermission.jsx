@@ -32,48 +32,46 @@ const AddPermission = () => {
     return transformItems(allPages);
   }, [allPages]);
 
-  // Get ONLY leaf nodes (actual pages, not modules/folders)
-  const getAllLeafKeys = useMemo(() => {
-    const leafKeys = new Set();
+  // Get ALL pages with IDs (including both parent pages and leaf pages)
+  const getAllPageKeys = useMemo(() => {
+    const pageKeys = new Set();
 
-    const extractLeafKeys = (items) => {
+    const extractPageKeys = (items) => {
       items.forEach(item => {
+        // Add this page if it has an ID (could be parent or leaf)
+        if (item.id) {
+          pageKeys.add(item.key);
+        }
+        // Recursively process children if they exist
         if (item.children && item.children.length > 0) {
-          // This has children, so it's a folder/module - skip it and check children
-          extractLeafKeys(item.children);
-        } else {
-          // This is a leaf node (actual page) - only add if it's a page (not a module)
-          // Check if this is an actual page by looking at URL pattern or ID range
-          if (item.id && item.id >= 55) { // Page IDs start from 55 in your data
-            leafKeys.add(item.key);
-          }
+          extractPageKeys(item.children);
         }
       });
     };
 
-    extractLeafKeys(transformedMenuItems);
-    return Array.from(leafKeys);
+    extractPageKeys(transformedMenuItems);
+    return Array.from(pageKeys);
   }, [transformedMenuItems]);
 
-  // Get leaf keys for a specific module (only actual pages)
-  const getModuleLeafKeys = (module) => {
-    const leafKeys = [];
+  // Get ALL page keys for a specific module (including parent pages and leaf pages)
+  const getModulePageKeys = (module) => {
+    const pageKeys = [];
 
-    const extractLeafKeys = (items) => {
+    const extractPageKeys = (items) => {
       items.forEach(item => {
+        // Add this page if it has an ID
+        if (item.id) {
+          pageKeys.push(item.key);
+        }
+        // Recursively process children
         if (item.children && item.children.length > 0) {
-          extractLeafKeys(item.children);
-        } else {
-          // Only add if it's an actual page (ID >= 55)
-          if (item.id && item.id >= 55) {
-            leafKeys.push(item.key);
-          }
+          extractPageKeys(item.children);
         }
       });
     };
 
-    extractLeafKeys([module]);
-    return leafKeys;
+    extractPageKeys([module]);
+    return pageKeys;
   };
 
   // Function to find key by page ID
@@ -90,10 +88,10 @@ const AddPermission = () => {
     return null;
   };
 
-  // Function to find page ID by key - WITH VALIDATION
+  // Function to find page ID by key
   const findPageIdByKey = (key, items = transformedMenuItems) => {
     for (let item of items) {
-      if (item.key === key && item.id && item.id >= 55) { // Only return valid page IDs
+      if (item.key === key && item.id) {
         return item.id;
       }
       if (item.children && item.children.length > 0) {
@@ -140,16 +138,16 @@ const AddPermission = () => {
     }
   }, [allowedPages, selectedRoleId]);
 
-  // Check if all leaf nodes in a module are selected
+  // Check if all pages in a module are selected
   const isModuleFullySelected = (module) => {
-    const moduleLeafKeys = getModuleLeafKeys(module);
-    return moduleLeafKeys.length > 0 && moduleLeafKeys.every(key => checkedKeys.includes(key));
+    const modulePageKeys = getModulePageKeys(module);
+    return modulePageKeys.length > 0 && modulePageKeys.every(key => checkedKeys.includes(key));
   };
 
-  // Check if some leaf nodes in a module are selected
+  // Check if some pages in a module are selected
   const isModulePartiallySelected = (module) => {
-    const moduleLeafKeys = getModuleLeafKeys(module);
-    return moduleLeafKeys.some(key => checkedKeys.includes(key)) && !isModuleFullySelected(module);
+    const modulePageKeys = getModulePageKeys(module);
+    return modulePageKeys.some(key => checkedKeys.includes(key)) && !isModuleFullySelected(module);
   };
 
   // Handle checkbox change for individual items
@@ -169,56 +167,29 @@ const AddPermission = () => {
 
   // Handle module header checkbox change
   const handleModuleHeaderChange = (module) => {
-    const moduleLeafKeys = getModuleLeafKeys(module);
+    const modulePageKeys = getModulePageKeys(module);
 
     if (isModuleFullySelected(module)) {
-      // Remove all module leaf keys
-      const newCheckedKeys = checkedKeys.filter(key => !moduleLeafKeys.includes(key));
+      // Remove all module page keys
+      const newCheckedKeys = checkedKeys.filter(key => !modulePageKeys.includes(key));
       setCheckedKeys(newCheckedKeys);
     } else {
-      // Add all module leaf keys that aren't already included
-      const newCheckedKeys = [...new Set([...checkedKeys, ...moduleLeafKeys])];
+      // Add all module page keys that aren't already included
+      const newCheckedKeys = [...new Set([...checkedKeys, ...modulePageKeys])];
       setCheckedKeys(newCheckedKeys);
     }
   };
 
-  // Handle select all - WITH VALIDATION
+  // Handle select all
   const handleSelectAll = () => {
-    const allLeafKeys = getAllLeafKeys;
-
-    // Find parent pages that are needed for module structure
-    const necessaryParentPages = new Set();
-
-    const findNecessaryParents = (items) => {
-      items.forEach(item => {
-        if (item.children && item.children.length > 0) {
-          // Check if any child is selected
-          const hasSelectedChild = item.children.some(child =>
-            allLeafKeys.includes(child.key)
-          );
-
-          if (hasSelectedChild && item.id && item.id >= 55) {
-            necessaryParentPages.add(item.key);
-          }
-
-          // Recursively check children
-          findNecessaryParents(item.children);
-        }
-      });
-    };
-
-    findNecessaryParents(transformedMenuItems);
-
-    // Combine leaf keys with necessary parent pages
-    const allKeysToSelect = [...new Set([...allLeafKeys, ...necessaryParentPages])];
+    const allPageKeys = getAllPageKeys;
 
     console.log('Selecting all keys:', {
-      leafKeys: allLeafKeys,
-      necessaryParents: Array.from(necessaryParentPages),
-      finalSelection: allKeysToSelect
+      pageKeys: allPageKeys,
+      totalCount: allPageKeys.length
     });
 
-    setCheckedKeys(allKeysToSelect);
+    setCheckedKeys(allPageKeys);
   };
 
   // Handle deselect all
@@ -226,7 +197,7 @@ const AddPermission = () => {
     setCheckedKeys([]);
   };
 
-  // Save permissions - WITH ENHANCED VALIDATION
+  // Save permissions
   const handleSavePermissions = async () => {
     if (!selectedRoleId) {
       message.warning('Please select a role first');
@@ -234,33 +205,59 @@ const AddPermission = () => {
     }
 
     try {
-      // Convert checked keys back to page IDs with strict validation
-      const selectedPageIds = checkedKeys
-        .map(key => findPageIdByKey(key))
-        .filter(id => id !== null && id !== undefined && id >= 55) // Only valid page IDs
-        .map(id => Number(id));
+      // Enhanced logging for debugging
+      //console.log('=== SAVE PERMISSIONS DEBUG ===');
+      //console.log('Total checked keys:', checkedKeys.length);
+      //console.log('Checked keys:', checkedKeys);
 
-      console.log('Saving permissions for role:', selectedRoleId);
-      console.log('Selected Keys:', checkedKeys);
-      console.log('Selected Page IDs (valid only):', selectedPageIds);
-
-      // Additional validation
-      const invalidKeys = checkedKeys.filter(key => {
+      // Convert checked keys back to page IDs with detailed logging
+      const keyToIdMap = [];
+      checkedKeys.forEach(key => {
         const pageId = findPageIdByKey(key);
-        return pageId === null || pageId < 55;
+        keyToIdMap.push({ key, pageId });
       });
 
-      if (invalidKeys.length > 0) {
-        console.warn('Invalid keys filtered out:', invalidKeys);
+      console.log('Key to ID mapping:', keyToIdMap);
+
+      // Extract page IDs and remove nulls/undefined
+      const pageIdsWithDuplicates = keyToIdMap
+        .map(item => item.pageId)
+        .filter(id => id !== null && id !== undefined)
+        .map(id => Number(id));
+
+     // console.log('Page IDs before deduplication:', pageIdsWithDuplicates);
+     // console.log('Count before deduplication:', pageIdsWithDuplicates.length);
+
+      // ✅ CRITICAL FIX: Deduplicate using Set
+      const selectedPageIds = [...new Set(pageIdsWithDuplicates)].sort((a, b) => a - b);
+
+     // console.log('Page IDs after deduplication:', selectedPageIds);
+     // console.log('Count after deduplication:', selectedPageIds.length);
+
+      // Find duplicates for debugging
+      const duplicates = pageIdsWithDuplicates.filter((item, index) =>
+        pageIdsWithDuplicates.indexOf(item) !== index
+      );
+      if (duplicates.length > 0) {
+       // console.warn('Duplicate page IDs found:', [...new Set(duplicates)]);
       }
 
+      // Find which keys mapped to null/undefined
+      const nullMappings = keyToIdMap.filter(item => item.pageId === null || item.pageId === undefined);
+      if (nullMappings.length > 0) {
+       // console.warn('Keys that did not map to page IDs:', nullMappings);
+      }
+
+      //console.log('Saving permissions for role:', selectedRoleId);
+      //console.log('=== END DEBUG ===');
+
       if (selectedPageIds.length === 0) {
-        message.warning('Please select at least one valid permission');
+        message.warning('Please select at least one permission');
         return;
       }
 
       // Final payload validation
-      console.log('Final Payload to Send:', { page_ids: selectedPageIds });
+      //console.log('Final Payload to Send:', { page_ids: selectedPageIds });
 
       // Call API to update permissions
       await updateRolePermission(selectedRoleId, { page_ids: selectedPageIds }, Toast);
