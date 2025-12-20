@@ -37,7 +37,7 @@ const Dashboard = () => {
   const [checkInTime, setCheckInTime] = useState(null);
   const { dashboardData, loading, error } = useDashboard();
 
-  console.log(dashboardData, 'dashboardData');
+ // console.log(dashboardData, 'dashboardData');
 
   const handleCheckIn = () => {
     const now = new Date();

@@ -9,7 +9,7 @@ export const useWorkShifts = () => {
     try {
       setLoading(true);
       const response = await workShiftAPI.getAll();
-      console.log(response)
+      // console.log(response)
       setShifts(response.data.results);
     } catch (err) {
       setError(err);

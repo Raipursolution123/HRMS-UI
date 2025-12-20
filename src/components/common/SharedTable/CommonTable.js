@@ -26,7 +26,7 @@ const CommonTable = ({
   deleteModal,
   formModal,
 }) => {
-  console.log(deleteModal,'deleteModal')
+ // console.log(deleteModal,'deleteModal')
   const getDeleteModalProps = (flag) => {
     if (deleteModal) {
       switch (flag) {

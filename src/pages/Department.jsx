@@ -107,7 +107,7 @@ const Department = () => {
   };
 
   const handleDelete = (record) => {
-    console.log("Delete clicked for:", record);
+   // console.log("Delete clicked for:", record);
     setSelectedDept(record);
     setIsConfirmOpen(true)
   };

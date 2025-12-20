@@ -12,7 +12,7 @@ export const usePages = () => {
     setError(null);
     try {
       const response = await pagesServicesAPI.getAll();
-      console.log(response,'response');
+     // console.log(response,'response');
       
       setAllPages(response?.data || []);
 
@@ -29,7 +29,7 @@ export const usePages = () => {
     setError(null);
     try {
       const response = await pagesServicesAPI.getByRole(roleId);
-      console.log(response,'response');
+     // console.log(response,'response');
       
       setAllowedPages(response?.data || []);
       // return response?.data; 
@@ -45,13 +45,13 @@ export const usePages = () => {
     setError(null);
     try {
       const response = await pagesServicesAPI.updateRolePermission(roleId,selectedPages);
-      console.log(response?.data?.message,'responseresponse');
+     // console.log(response?.data?.message,'responseresponse');
       Toast.success(response?.data?.message)
       
       fetchPagesByRole(roleId);
       return response?.data; 
     } catch (err) {
-        console.log(err,'errerrerrerrerr');
+     // console.log(err,'errerrerrerrerr');
       Toast.error("something went wrong")
       setError(err.response?.data?.message || 'Failed to fetch roles');
       return null;

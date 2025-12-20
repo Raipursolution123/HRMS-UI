@@ -99,7 +99,7 @@ const JobRequirements = () => {
   };
 
   const handleSubmitApplication = (values) => {
-    console.log('Application submitted:', values);
+   // console.log('Application submitted:', values);
     message.success('Application submitted successfully! We will contact you soon.');
     setApplyModalVisible(false);
     form.resetFields();

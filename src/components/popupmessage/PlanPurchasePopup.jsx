@@ -32,7 +32,7 @@ const PlanPurchasePopup = ({ planId, onClose }) => {
 
   const handlePay = () => {
     // This is where payment integration would go
-    console.log(`Processing payment for plan: ${selectedPlan?.plan_name}`);
+    //console.log(`Processing payment for plan: ${selectedPlan?.plan_name}`);
     handleClose();
   };
 

@@ -48,7 +48,7 @@ export const usePromotion = () => {
   const fetchEmployees = async () => {
     try {
       const res = await manageEmployeeApi.getAll();
-      console.log(res.data.results);
+      // console.log(res.data.results);
       setEmployees(res.data.results || []);
     } catch (err) {
       console.error('Error fetching employees', err);

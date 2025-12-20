@@ -15,7 +15,7 @@ export const usePublicHoliday = () => {
             page_size: pageSize,
             search,
           });
-      console.log("Public Holidays API response:", response.data);
+      //console.log("Public Holidays API response:", response.data);
 
       setPublicHolidays(response.data.results);
     } catch (err) {

@@ -23,7 +23,7 @@ const TerminationModal = ({ open, onClose, onSubmit, employees, editingData, loa
   }, [editingData, form]);
 
   const handleFinish = (values) => {
-     console.log('Form values:', values);
+    //console.log('Form values:', values);
   const payload = {
     terminate_to: Number(values.terminate_to),
     terminate_by: Number(values.terminate_by),
@@ -33,7 +33,7 @@ const TerminationModal = ({ open, onClose, onSubmit, employees, editingData, loa
     termination_date: values.termination_date.format('YYYY-MM-DD'),
     description: values.description,
   };
-  console.log('Payload:', payload);
+  //console.log('Payload:', payload);
   onSubmit(payload);
   };
 

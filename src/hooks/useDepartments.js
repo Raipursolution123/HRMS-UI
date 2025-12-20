@@ -27,7 +27,7 @@ export const useDepartments = () => {
   };
 
   const addDepartment = async (departmentData) => {
-    console.log(departmentData,"departmentData"); 
+    //console.log(departmentData,"departmentData"); 
     try {
       setLoading(true);
       await departmentAPI.create(departmentData);
