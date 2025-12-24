@@ -1,4 +1,4 @@
-  
+
 //   import {
 //   MenuFoldOutlined,
 //   MenuUnfoldOutlined,
@@ -32,7 +32,7 @@
 //   ReadOutlined,
 //   TrophyOutlined,
 //   NotificationOutlined,
-  
+
 // } from '@ant-design/icons';
 //   export const menuItems = [
 //   {
@@ -487,6 +487,7 @@ import {
   ReadOutlined,
   TrophyOutlined,
   NotificationOutlined,
+  CustomerServiceOutlined,
 } from '@ant-design/icons';
 import { usePages } from '../hooks/pages/usePages';
 
@@ -865,20 +866,20 @@ export const getMenuItems = (userRole) => {
       label: 'Performance',
       roles: ['ADMIN', 'MANAGER'],
       children: [
-        { 
-          key: '/performance-category', 
+        {
+          key: '/performance-category',
           icon: <ApartmentOutlined />,
           label: 'Performance Category',
           roles: ['ADMIN'],
         },
-        { 
-          key: '/performance-criteria', 
+        {
+          key: '/performance-criteria',
           icon: <SafetyCertificateOutlined />,
           label: 'Performance Criteria',
           roles: ['ADMIN'],
         },
-        { 
-          key: '/EMPLOYEE-performance', 
+        {
+          key: '/EMPLOYEE-performance',
           icon: <UserOutlined />,
           label: 'Employee Performance',
           roles: ['ADMIN', 'MANAGER'],
@@ -889,8 +890,8 @@ export const getMenuItems = (userRole) => {
           label: 'Report',
           roles: ['ADMIN', 'MANAGER'],
           children: [
-            { 
-              key: '/performance-summary-report', 
+            {
+              key: '/performance-summary-report',
               icon: <BarChartOutlined />,
               label: 'Summary Report',
               roles: ['ADMIN', 'MANAGER'],
@@ -905,14 +906,14 @@ export const getMenuItems = (userRole) => {
       label: 'Recruitment',
       roles: ['ADMIN', 'MANAGER'],
       children: [
-        { 
-          key: '/job-post', 
+        {
+          key: '/job-post',
           icon: <FileTextOutlined />,
           label: 'Job Post',
           roles: ['ADMIN', 'MANAGER'],
         },
-        { 
-          key: '/job-candidate', 
+        {
+          key: '/job-candidate',
           icon: <UserOutlined />,
           label: 'Job Candidate',
           roles: ['ADMIN', 'MANAGER'],
@@ -925,20 +926,20 @@ export const getMenuItems = (userRole) => {
       label: 'Training',
       roles: ['ADMIN', 'MANAGER'],
       children: [
-        { 
-          key: '/training-type', 
+        {
+          key: '/training-type',
           icon: <ApartmentOutlined />,
           label: 'Training Type',
           roles: ['ADMIN'],
         },
-        { 
-          key: '/training-list', 
+        {
+          key: '/training-list',
           icon: <CalendarOutlined />,
           label: 'Training List',
           roles: ['ADMIN', 'MANAGER'],
         },
-        { 
-          key: '/training-report', 
+        {
+          key: '/training-report',
           icon: <BarChartOutlined />,
           label: 'Training Report',
           roles: ['ADMIN', 'MANAGER'],
@@ -951,8 +952,8 @@ export const getMenuItems = (userRole) => {
       label: 'Award',
       roles: ['ADMIN', 'MANAGER'],
       children: [
-        { 
-          key: '/award', 
+        {
+          key: '/award',
           icon: <GiftOutlined />,
           label: 'Award',
           roles: ['ADMIN', 'MANAGER'],
@@ -965,8 +966,8 @@ export const getMenuItems = (userRole) => {
       label: 'Notice Board',
       roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
       children: [
-        { 
-          key: '/notice', 
+        {
+          key: '/notice',
           icon: <FileTextOutlined />,
           label: 'Notice',
           roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
@@ -979,11 +980,25 @@ export const getMenuItems = (userRole) => {
       label: 'Settings',
       roles: ['ADMIN'],
       children: [
-        { 
-          key: '/settings', 
+        {
+          key: '/settings',
           icon: <SettingOutlined />,
           label: 'Settings',
           roles: ['ADMIN'],
+        },
+      ],
+    },
+    {
+      key: '/support-centre',
+      icon: <CustomerServiceOutlined />,
+      label: 'Support Centre',
+      roles: ['ADMIN', 'MANAGER'],
+      children: [
+        {
+          key: '/support-centre',
+          icon: <CustomerServiceOutlined />,
+          label: 'Support Centre',
+          roles: ['ADMIN', 'MANAGER'],
         },
       ],
     },
@@ -1042,7 +1057,8 @@ export const getIconComponent = (iconName) => {
     CheckOutlined: <CheckOutlined />,
     GiftOutlined: <GiftOutlined />,
     SafetyCertificateOutlined: <SafetyCertificateOutlined />,
+    CustomerServiceOutlined: <CustomerServiceOutlined />,
   };
-  
+
   return iconMap[iconName] || <SettingOutlined />;
 };

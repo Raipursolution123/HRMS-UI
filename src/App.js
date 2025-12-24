@@ -77,6 +77,7 @@ import AddGenerateBonus from './pages/Payroll/AddGenerateBonus';
 import EmployeePayslip from './pages/Payroll/EmployeePayslip';
 import Setting from './pages/Settings';
 import ViewUserProfile from './pages/ViewUserProfile';
+import SupportUser from './pages/SupportUser';
 
 function App() {
   return (
@@ -314,6 +315,7 @@ function App() {
               <Route path='award' element={<Award />} />
               <Route path='notice' element={<Notice />} />
               <Route path="settings" element={<Setting />} />
+              <Route path='support-centre' element={<SupportUser />} />
             </Route>
 
           </Routes>
