@@ -102,12 +102,12 @@ const SupportUser = () => {
                 requiredMark="optional"
               >
                 <Form.Item
-                  label={<span style={{ fontWeight: 600 }}>Problem Title</span>}
+                  label={<span style={{ fontWeight: 600 }}>Issue Title</span>}
                   name="title"
-                  rules={[{ required: true, message: 'Please enter a problem title' }]}
+                  rules={[{ required: true, message: 'Please enter a issue title' }]}
                 >
                   <Input
-                    placeholder="Enter a brief title for your problem"
+                    placeholder="Enter a brief title for your issue"
                     prefix={<FileTextOutlined style={{ color: '#bfbfbf' }} />}
                     size="large"
                     style={{ borderRadius: '8px' }}
@@ -115,9 +115,9 @@ const SupportUser = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label={<span style={{ fontWeight: 600 }}>Problem Description</span>}
+                  label={<span style={{ fontWeight: 600 }}>Issue Description</span>}
                   name="description"
-                  rules={[{ required: true, message: 'Please describe the problem in detail' }]}
+                  rules={[{ required: true, message: 'Please describe the issue in detail' }]}
                 >
                   <TextArea
                     rows={6}
@@ -127,7 +127,7 @@ const SupportUser = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label={<span style={{ fontWeight: 600 }}>Problem Query</span>}
+                  label={<span style={{ fontWeight: 600 }}>Issue Query</span>}
                   name="query"
                   rules={[{ required: true, message: 'Please enter your specific query' }]}
                 >
