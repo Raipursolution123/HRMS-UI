@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Typography, Space, Divider, Tag } from 'antd';
+import { Modal, Button, Typography, Space, Divider, Tag, message } from 'antd';
 import { CheckCircleFilled, CrownOutlined } from '@ant-design/icons';
 import { usePlans } from '../../hooks/usePlans';
+import { useSelector } from 'react-redux';
+import API from '../../services/api';
 
 const { Title, Text, Paragraph } = Typography;
 
-const PlanPurchasePopup = ({ planId, onClose }) => {
+const PlanPurchasePopup = ({ planId, onClose, onSuccess }) => {
   const [visible, setVisible] = useState(false);
   const { plans, loading } = usePlans();
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     if (planId && plans.length > 0) {
       const plan = plans.find(p => p.id.toString() === planId.toString());
       if (plan) {
         if (plan.plan_name === 'Free') {
-          localStorage.removeItem('selected_plan_id');
+          // Handle free plan subscription
+          handleFreePlanSubscription(plan);
           return;
         }
         setSelectedPlan(plan);
@@ -24,16 +29,109 @@ const PlanPurchasePopup = ({ planId, onClose }) => {
     }
   }, [planId, plans]);
 
+  const handleFreePlanSubscription = async (plan) => {
+    try {
+      setProcessing(true);
+      const response = await API.post('/api/subscribe/', {
+        plan_id: plan.id
+      });
+      message.success('Free plan activated successfully!');
+      onSuccess && onSuccess();
+      onClose();
+    } catch (error) {
+      message.error(error.response?.data?.error || 'Failed to activate free plan');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleClose = () => {
     setVisible(false);
     localStorage.removeItem('selected_plan_id');
     onClose();
   };
 
-  const handlePay = () => {
-    // This is where payment integration would go
-    //console.log(`Processing payment for plan: ${selectedPlan?.plan_name}`);
-    handleClose();
+  const handlePay = async () => {
+    if (!selectedPlan) return;
+
+    try {
+      setProcessing(true);
+
+      // Step 1: Create Razorpay order
+      const orderResponse = await API.post('/api/subscribe/create-order/', {
+        plan_id: selectedPlan.id
+      });
+
+      const { order_id, amount, currency, key } = orderResponse.data;
+
+      // Get user profile data for prefill
+      const profile = user?.profile?.profile || {};
+      const userName = profile.first_name && profile.last_name 
+        ? `${profile.first_name} ${profile.last_name}` 
+        : user?.email || 'Customer';
+      const userEmail = user?.email || '';
+      const userPhone = profile.phone || '';
+
+      // Step 2: Initialize Razorpay Checkout
+      const options = {
+        key: key, // Razorpay Key ID from backend
+        amount: amount, // Amount in paise
+        currency: currency,
+        name: 'HRMS Platform',
+        description: `Subscription for ${selectedPlan.plan_name} Plan`,
+        order_id: order_id,
+        handler: async function (response) {
+          // Step 3: Verify payment on backend
+          try {
+            const verifyResponse = await API.post('/api/subscribe/verify-payment/', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plan_id: selectedPlan.id
+            });
+
+            message.success('Payment successful! Plan activated.');
+            setVisible(false);
+            onSuccess && onSuccess();
+            onClose();
+          } catch (error) {
+            message.error(error.response?.data?.error || 'Payment verification failed');
+            console.error('Payment verification error:', error);
+          } finally {
+            setProcessing(false);
+          }
+        },
+        prefill: {
+          name: userName,
+          email: userEmail,
+          contact: userPhone
+        },
+        theme: {
+          color: '#6f53e1'
+        },
+        modal: {
+          ondismiss: function() {
+            setProcessing(false);
+            message.info('Payment cancelled');
+          }
+        }
+      };
+
+      // Check if Razorpay is loaded
+      if (window.Razorpay) {
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+      } else {
+        message.error('Payment gateway not loaded. Please refresh the page.');
+        setProcessing(false);
+      }
+      
+    } catch (error) {
+      setProcessing(false);
+      const errorMsg = error.response?.data?.error || 'Failed to initialize payment';
+      message.error(errorMsg);
+      console.error('Payment initialization error:', error);
+    }
   };
 
   if (!selectedPlan) return null;
@@ -118,9 +216,9 @@ const PlanPurchasePopup = ({ planId, onClose }) => {
             borderColor: '#6f53e1',
             boxShadow: '0 4px 14px 0 rgba(111, 83, 225, 0.39)',
           }}
-          loading={loading}
+          loading={processing || loading}
         >
-          Pay & Activate Now
+          {processing ? 'Processing...' : 'Pay & Activate Now'}
         </Button>
         <Button
           type="link"

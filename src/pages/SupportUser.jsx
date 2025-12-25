@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Form,
   Input,
@@ -17,8 +17,13 @@ import {
   QuestionCircleOutlined,
   FileTextOutlined,
   MessageOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  UserOutlined,
+  MailOutlined
 } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
+import { supportAPI } from '../services/supportServices';
+import { useUserProfile } from '../hooks/useUserProfile';
 import '../styles/design-system.css';
 import '../styles/table-pages.css';
 
@@ -29,24 +34,67 @@ const SupportUser = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
+  
+  // Get user data if authenticated
+  const { profile } = useUserProfile();
+  const authToken = useSelector((state) => state.auth?.accessToken);
+  const isAuthenticated = !!authToken;
+
+  // Pre-fill form if user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && profile) {
+      const profileData = profile?.profile || profile;
+      const firstName = profileData?.first_name || '';
+      const lastName = profileData?.last_name || '';
+      const fullName = `${firstName} ${lastName}`.trim() || '';
+      const email = profile?.email || profileData?.email || '';
+
+      if (fullName || email) {
+        form.setFieldsValue({
+          name: fullName,
+          email: email
+        });
+      }
+    }
+  }, [isAuthenticated, profile, form]);
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Mock API call
-      console.log('Support Query Submitted:', {
-        ...values,
-        attachment: fileList[0]?.originFileObj
-      });
+      // Prepare FormData for file upload
+      const formData = new FormData();
+      
+      // Add required fields
+      formData.append('name', values.name || '');
+      formData.append('email', values.email || '');
+      formData.append('problem_title', values.title || '');
+      formData.append('problem_description', values.description || '');
+      formData.append('problem_query', values.query || '');
 
-      // Simulating a delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Add file attachments if any
+      if (fileList.length > 0) {
+        fileList.forEach((file) => {
+          if (file.originFileObj) {
+            formData.append('attachments', file.originFileObj);
+          }
+        });
+      }
 
-      message.success('Your support query has been sent successfully! Our team will get back to you soon.');
-      form.resetFields();
-      setFileList([]);
+      // Call the API
+      const response = await supportAPI.createTicket(formData);
+
+      if (response.data) {
+        message.success('Your support query has been sent successfully! Our team will get back to you soon.');
+        form.resetFields();
+        setFileList([]);
+      }
     } catch (error) {
-      message.error('Failed to send query. Please try again.');
+      console.error('Support ticket creation error:', error);
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          'Failed to send query. Please try again.';
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -101,6 +149,37 @@ const SupportUser = () => {
                 onFinish={onFinish}
                 requiredMark="optional"
               >
+                <Form.Item
+                  label={<span style={{ fontWeight: 600 }}>Name</span>}
+                  name="name"
+                  rules={[{ required: true, message: 'Please enter your name' }]}
+                >
+                  <Input
+                    placeholder="Enter your full name"
+                    prefix={<UserOutlined style={{ color: '#bfbfbf' }} />}
+                    size="large"
+                    style={{ borderRadius: '8px' }}
+                    disabled={isAuthenticated && profile}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label={<span style={{ fontWeight: 600 }}>Email</span>}
+                  name="email"
+                  rules={[
+                    { required: true, message: 'Please enter your email' },
+                    { type: 'email', message: 'Please enter a valid email address' }
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter your email address"
+                    prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
+                    size="large"
+                    style={{ borderRadius: '8px' }}
+                    disabled={isAuthenticated && profile}
+                  />
+                </Form.Item>
+
                 <Form.Item
                   label={<span style={{ fontWeight: 600 }}>Problem Title</span>}
                   name="title"
