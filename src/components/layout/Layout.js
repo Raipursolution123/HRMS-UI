@@ -294,7 +294,7 @@ const MainLayout = () => {
   );
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ height: '100vh', overflow: 'hidden' }}>
       {contextHolder}
       <PlanPurchasePopup planId={selectedPlanId} onClose={() => setSelectedPlanId(null)} />
 

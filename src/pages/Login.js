@@ -6,7 +6,7 @@ import { Form, Input, Button, Card, message, Typography, Image } from 'antd';
 import { UserOutlined, LockOutlined, HomeOutlined } from '@ant-design/icons';
 import { login, clearError, logout } from '../store/slices/authSlice';
 import { authAPI } from '../services/authServices';
-import logo from '../assets/images/logo.svg';
+import logo from '../assets/images/logo2.svg';
 import { useToast } from '../hooks/useToast';
 const { Title, Text } = Typography;
 
@@ -150,7 +150,7 @@ const Login = () => {
         </div>
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <Image
-            width={120}
+            width={220}
             preview={false}
             src={logo}
             style={{ marginTop: 25, height: 100 }}

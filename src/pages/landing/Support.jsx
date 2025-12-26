@@ -54,7 +54,7 @@ const Support = () => {
             type="primary"
             size="large"
             icon={<MailOutlined />}
-            href="mailto:support@hrms.com"
+            href="mailto:raipursolution069@gmail.com"
             style={{
               height: '56px',
               padding: '0 40px',
@@ -64,7 +64,7 @@ const Support = () => {
               border: 'none',
             }}
           >
-            support@hrms.com
+            raipursolution069@gmail.com
           </Button>
         </Card>
 

@@ -319,7 +319,7 @@ const Dashboard = () => {
                         </Text>
                       </div>
                       <Text className="notice-description">
-                        {item.description}
+                        Description: {item.description}
                       </Text>
                     </div>
                   </List.Item>

@@ -2,10 +2,12 @@ import React from 'react';
 import { Typography, Button, Row, Col, Space } from 'antd';
 import { ArrowRightOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import dashboardImg from '../../assets/landing/dashboard.png';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Paragraph } = Typography;
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <div style={{
       padding: 'clamp(40px, 8vw, 100px) 24px',
@@ -57,8 +59,9 @@ const Hero = () => {
                     fontSize: 'clamp(14px, 2vw, 18px)',
                     borderRadius: '12px'
                   }}
+                  onClick={() => navigate('/pricing')}
                 >
-                  Book a Demo
+                  Buy a plan
                 </Button>
                 <Button
                   size="large"
@@ -69,6 +72,7 @@ const Hero = () => {
                     fontSize: 'clamp(14px, 2vw, 18px)',
                     borderRadius: '12px'
                   }}
+                  onClick={() => navigate('/login')}
                 >
                   Start For Free
                 </Button>
@@ -82,8 +86,8 @@ const Hero = () => {
                 flexWrap: 'wrap',
                 justifyContent: { xs: 'center', md: 'flex-start' }
               }}>
-                <div>✓ No credit card required</div>
-                <div>✓ 14-day free trial</div>
+                <div>✓ Easy to manage</div>
+                <div>✓ a free plan for trial</div>
                 <div>✓ Cancel anytime</div>
               </div>
             </Space>

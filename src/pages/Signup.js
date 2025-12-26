@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Form, Input, Button, Card, Typography, Image, Row, Col } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, BankOutlined, HomeOutlined } from '@ant-design/icons';
 import { signup, clearError } from '../store/slices/authSlice';
-import logo from '../assets/images/logo.svg';
+import logo from '../assets/images/logo2.svg';
 import { useToast } from '../hooks/useToast';
 
 const { Title, Text } = Typography;
@@ -71,7 +71,7 @@ const Signup = () => {
       >
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <Image
-            width={100}
+            width={220}
             preview={false}
             src={logo}
             style={{ marginBottom: 10 }}

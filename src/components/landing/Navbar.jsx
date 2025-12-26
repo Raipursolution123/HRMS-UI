@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Layout, Menu, Button, Drawer } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/landing/logo1.png';
+import logo from '../../assets/landing/logo2.jpeg';
+import { Color } from 'antd/es/color-picker';
 
 const { Header } = Layout;
 
@@ -57,8 +58,8 @@ const Navbar = () => {
           overflowedIndicator={null}
         />
         <div style={{ display: 'flex', gap: '12px' }}>
-          <Button type="text" onClick={() => navigate('/login')}>Sign In</Button>
-          <Button type="primary">Demo Account</Button>
+          <Button type="text" style={{ color: '#1677ff' }} onClick={() => navigate('/login')}>Sign In</Button>
+          {/* <Button type="primary">Demo Account</Button> */}
         </div>
       </div>
 
@@ -91,7 +92,7 @@ const Navbar = () => {
         />
         <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <Button block onClick={() => navigate('/login')}>Sign In</Button>
-          <Button type="primary" block>Book a Demo</Button>
+          {/* <Button type="primary" block>Book a Demo</Button> */}
         </div>
       </Drawer>
     </Header>

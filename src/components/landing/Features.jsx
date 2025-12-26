@@ -28,8 +28,8 @@ const features = [
     icon: <ScheduleOutlined style={{ fontSize: 'clamp(28px, 5vw, 32px)', color: '#1677ff' }} />,
   },
   {
-    title: 'Onboarding',
-    description: 'Create a great first impression with digital offer letters and self-onboarding.',
+    title: 'Bonus Generate',
+    description: 'Generate bonuse automatically to your employess based on any event or prfomance metric.',
     icon: <TeamOutlined style={{ fontSize: 'clamp(28px, 5vw, 32px)', color: '#1677ff' }} />,
   },
   {

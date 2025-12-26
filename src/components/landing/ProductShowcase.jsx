@@ -4,11 +4,13 @@ import { CheckCircleFilled, ArrowRightOutlined } from '@ant-design/icons';
 import employeeListImg from '../../assets/landing/employee-list.png';
 import attendanceImg from '../../assets/landing/attendance.png';
 import payrollImg from '../../assets/landing/payroll.png';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Paragraph } = Typography;
 
 const ProductShowcase = () => {
   const [activeTab, setActiveTab] = useState('1');
+  const navigate = useNavigate();
 
   const items = [
     {
@@ -98,6 +100,7 @@ const ProductShowcase = () => {
                   }}
                   block
                   className="mobile-block-button"
+                  onClick={() => navigate('/pricing')}
                 >
                   Learn more about {currentItem.label}
                 </Button>

@@ -8,6 +8,8 @@
 /* ========== Sidebar Styles ========== */
 .hrms-layout-sider {
   position: relative;
+  height: 100vh;
+  overflow-y: auto;
   /* Deep Indigo to Midnight Blue Gradient */
   background: linear-gradient(180deg, #312e81 0%, #1e1b4b 100%) !important;
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
@@ -317,7 +319,8 @@
 
 .hrms-layout-content-wrapper {
   background: var(--bg-secondary);
-  min-height: calc(100vh - 64px);
+  height: 100vh;
+  overflow-y: auto;
   transition: background-color var(--transition-base);
 }
 

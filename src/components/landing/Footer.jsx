@@ -1,7 +1,7 @@
 import React from 'react';
 import { Layout, Row, Col, Typography, Space } from 'antd';
 import { TwitterOutlined, LinkedinOutlined, FacebookOutlined, InstagramOutlined } from '@ant-design/icons';
-import logo from '../../assets/landing/logo1.png';
+import logo from '../../assets/landing/logo2.jpeg';
 
 const { Footer: AntFooter } = Layout;
 const { Title, Text, Link } = Typography;
