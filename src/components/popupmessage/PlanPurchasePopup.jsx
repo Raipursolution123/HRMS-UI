@@ -32,7 +32,7 @@ const PlanPurchasePopup = ({ planId, onClose, onSuccess }) => {
   const handleFreePlanSubscription = async (plan) => {
     try {
       setProcessing(true);
-      const response = await API.post('/api/subscribe/', {
+      const response = await API.post('/subscribe/', {
         plan_id: plan.id
       });
       message.success('Free plan activated successfully!');
@@ -58,7 +58,7 @@ const PlanPurchasePopup = ({ planId, onClose, onSuccess }) => {
       setProcessing(true);
 
       // Step 1: Create Razorpay order
-      const orderResponse = await API.post('/api/subscribe/create-order/', {
+      const orderResponse = await API.post('/subscribe/create-order/', {
         plan_id: selectedPlan.id
       });
 
@@ -83,7 +83,7 @@ const PlanPurchasePopup = ({ planId, onClose, onSuccess }) => {
         handler: async function (response) {
           // Step 3: Verify payment on backend
           try {
-            const verifyResponse = await API.post('/api/subscribe/verify-payment/', {
+            const verifyResponse = await API.post('/subscribe/verify-payment/', {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
