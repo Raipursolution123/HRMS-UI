@@ -66,7 +66,16 @@ const Login = () => {
           //console.log("Tokens found:", { access, refresh });
 
           if (access && refresh) {
-            window.location.href = `http://localhost:3001?access=${access}&refresh=${refresh}`;
+            // Determine Super Admin UI URL based on current hostname (runtime check)
+            const isProduction = window.location.hostname === 'hrms.raipursolutions.com' || 
+                                 window.location.hostname.includes('raipursolutions.com');
+            const superAdminUrl = process.env.REACT_APP_SUPER_ADMIN_UI_URL || 
+              (isProduction 
+                ? 'https://hrmssuperadmin.raipursolutions.com' 
+                : 'http://localhost:3001');
+            
+            // Redirect to Super Admin UI with authentication tokens
+            window.location.href = `${superAdminUrl}?access=${access}&refresh=${refresh}`;
             return;
           } else {
             //console.error("Tokens missing in login response:", result);

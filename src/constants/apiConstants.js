@@ -1,6 +1,17 @@
 // API Base URLs
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
+// Super Admin UI URL (for redirects after Super Admin login)
+// Check runtime environment (more reliable than build-time NODE_ENV)
+const isProduction = typeof window !== 'undefined' && 
+  (window.location.hostname === 'hrms.raipursolutions.com' || 
+   window.location.hostname.includes('raipursolutions.com'));
+
+export const SUPER_ADMIN_UI_URL = process.env.REACT_APP_SUPER_ADMIN_UI_URL || 
+  (isProduction 
+    ? 'https://hrmssuperadmin.raipursolutions.com' 
+    : 'http://localhost:3001');
+
 // API Endpoints
 export const API_ENDPOINTS = {
   // Auth endpoints
