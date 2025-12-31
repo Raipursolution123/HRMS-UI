@@ -1,12 +1,29 @@
 import React from 'react';
 import { Layout, Row, Col, Typography, Space } from 'antd';
 import { TwitterOutlined, LinkedinOutlined, FacebookOutlined, InstagramOutlined } from '@ant-design/icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/landing/logo2.jpeg';
+
 
 const { Footer: AntFooter } = Layout;
 const { Title, Text, Link } = Typography;
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollToSection = (e, sectionId) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate('/#' + sectionId);
+    }
+  };
+
   return (
     <AntFooter style={{ background: '#f8fafc', padding: 'clamp(40px, 8vw, 80px) 24px clamp(24px, 4vw, 40px)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -19,20 +36,20 @@ const Footer = () => {
               </Text>
             </div>
             <Space size="large" style={{ justifyContent: { xs: 'center', md: 'flex-start' }, width: { xs: '100%', md: 'auto' } }}>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(18px, 3vw, 20px)' }}><TwitterOutlined /></Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(18px, 3vw, 20px)' }}><LinkedinOutlined /></Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(18px, 3vw, 20px)' }}><FacebookOutlined /></Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(18px, 3vw, 20px)' }}><InstagramOutlined /></Link>
+              
+              <Link href="https://www.linkedin.com/company/raipur-solutions/" style={{ color: '#64748b', fontSize: 'clamp(18px, 3vw, 20px)' }}><LinkedinOutlined /></Link>
+              <Link href="https://www.facebook.com/share/1DQGGAAhfF/?mibextid=wwXIfr" style={{ color: '#64748b', fontSize: 'clamp(18px, 3vw, 20px)' }}><FacebookOutlined /></Link>
+              <Link href="https://www.instagram.com/raipur_solutions?igsh=NXU0bjU2ODk0dm5o&utm_source=qr" style={{ color: '#64748b', fontSize: 'clamp(18px, 3vw, 20px)' }}><InstagramOutlined /></Link>
             </Space>
           </Col>
 
           <Col xs={12} sm={8} md={5}>
             <Title level={5} style={{ marginBottom: '24px', fontSize: 'clamp(1rem, 2.5vw, 1.1rem)' }}>Product</Title>
             <Space direction="vertical" size="middle">
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Features</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Pricing</Link>
+              <Link onClick={(e) => scrollToSection(e, 'product-showcase')} style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Features</Link>
+              <Link onClick={() => navigate('/pricing')} style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Pricing</Link>
               <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Security</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Integrations</Link>
+              {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Integrations</Link> */}
             </Space>
           </Col>
 
@@ -40,19 +57,19 @@ const Footer = () => {
             <Title level={5} style={{ marginBottom: '24px', fontSize: 'clamp(1rem, 2.5vw, 1.1rem)' }}>Company</Title>
             <Space direction="vertical" size="middle">
               <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>About Us</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Careers</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Blog</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Contact</Link>
+              {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Careers</Link> */}
+              {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Blog</Link> */}
+              <Link onClick={(e) => scrollToSection(e, 'hero-section')} style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Contact</Link>
             </Space>
           </Col>
 
           <Col xs={24} sm={8} md={6}>
             <Title level={5} style={{ marginBottom: '24px', fontSize: 'clamp(1rem, 2.5vw, 1.1rem)' }}>Resources</Title>
             <Space direction="vertical" size="middle">
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Help Center</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>API Documentation</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Community</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Partners</Link>
+              <Link onClick={() => navigate('/support')} style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Help Center</Link>
+              {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>API Documentation</Link> */}
+              {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Community</Link> */}
+              {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Partners</Link> */}
             </Space>
           </Col>
         </Row>

@@ -8,6 +8,7 @@ import { login, clearError, logout } from '../store/slices/authSlice';
 import { authAPI } from '../services/authServices';
 import logo from '../assets/images/logo2.svg';
 import { useToast } from '../hooks/useToast';
+import './AuthStyles.css';
 const { Title, Text } = Typography;
 
 const Login = () => {
@@ -67,13 +68,13 @@ const Login = () => {
 
           if (access && refresh) {
             // Determine Super Admin UI URL based on current hostname (runtime check)
-            const isProduction = window.location.hostname === 'hrms.raipursolutions.com' || 
-                                 window.location.hostname.includes('raipursolutions.com');
-            const superAdminUrl = process.env.REACT_APP_SUPER_ADMIN_UI_URL || 
-              (isProduction 
-                ? 'https://hrmssuperadmin.raipursolutions.com' 
+            const isProduction = window.location.hostname === 'hrms.raipursolutions.com' ||
+              window.location.hostname.includes('raipursolutions.com');
+            const superAdminUrl = process.env.REACT_APP_SUPER_ADMIN_UI_URL ||
+              (isProduction
+                ? 'https://hrmssuperadmin.raipursolutions.com'
                 : 'http://localhost:3001');
-            
+
             // Redirect to Super Admin UI with authentication tokens
             window.location.href = `${superAdminUrl}?access=${access}&refresh=${refresh}`;
             return;
@@ -104,63 +105,41 @@ const Login = () => {
 
   };
   return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#e6e9ff',
-      }}
-    >
+    <div className="auth-container landing-bg">
+
       <Button
         type="text"
         icon={<HomeOutlined />}
         onClick={() => navigate('/')}
-        style={{
-          position: 'absolute',
-          top: 20,
-          left: 20,
-          fontWeight: 600,
-          color: '#333'
-        }}
+        className="auth-back-btn"
       >
         Back to Home
       </Button>
+
       {contextHolder}
-      <Card
-        style={{
-          width: '90%',
-          maxWidth: 380,
-          padding: '40px 20px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-          borderRadius: '6px',
-          backgroundColor: '#f7f7f7',
-        }}
-      >
-        <div style={{
-          position: 'absolute',
-          top: 20,
-          left: 30,
-        }}>
-          <Title level={4} style={{ color: '#333', marginBottom: 0 }}>
-            LOG IN
-          </Title>
 
-        </div>
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+      <Card className="auth-card" bordered={false} style={{ width: '100%', maxWidth: 420 }}>
+        <div className="auth-header">
           <Image
-            width={220}
-            preview={false}
             src={logo}
-            style={{ marginTop: 25, height: 100 }}
+            preview={false}
+            className="auth-logo"
           />
+          <Title level={3} className="auth-title">Welcome Back</Title>
+          <Text className="auth-subtitle">Log in to your HRMS dashboard</Text>
         </div>
 
-        <Form form={form} name="login" onFinish={onFinish} autoComplete="off" layout="vertical">
+        <Form
+          form={form}
+          name="login"
+          onFinish={onFinish}
+          autoComplete="off"
+          layout="vertical"
+          size="large"
+        >
           <Form.Item
-            label={<span style={{ fontWeight: 600, color: '#333' }}>Registered Email</span>}
             name="email"
+            label={<span className="auth-label">Registered Email</span>}
             rules={[
               { required: true, message: 'Please input your email!' },
               { type: 'email', message: 'Please enter a valid email!' },
@@ -168,55 +147,44 @@ const Login = () => {
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="User Name / Email"
-              style={{
-                borderRadius: 3,
-                padding: '8px 10px',
-              }}
+              placeholder="name@example.com"
+              className="auth-input"
             />
           </Form.Item>
 
           <Form.Item
-            label={<span style={{ fontWeight: 600, color: '#333' }}>Password</span>}
             name="password"
+            label={<span className="auth-label">Password</span>}
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Password"
-              style={{
-                borderRadius: 3,
-                padding: '8px 10px',
-              }}
+              placeholder="••••••••"
+              className="auth-input"
             />
           </Form.Item>
 
-          <Form.Item style={{ marginTop: 30 }}>
+          <Form.Item style={{ marginTop: 20 }}>
             <Button
               type="primary"
               htmlType="submit"
               loading={loading}
-              style={{
-                width: '100%',
-                backgroundColor: '#6f53e1',
-                borderColor: '#6f53e1',
-                height: 40,
-                borderRadius: 4,
-                fontWeight: 500,
-              }}
+              block
+              className="auth-submit-btn"
             >
               Log in
             </Button>
           </Form.Item>
         </Form>
-        <div style={{ textAlign: 'center', marginTop: 15 }}>
-          <Text>If you don't have an account? </Text>
+
+        <div className="auth-footer">
+          <Text>Don't have an account? </Text>
           <Button
             type="link"
             onClick={() => navigate('/signup')}
-            style={{ padding: 0, fontWeight: 600, color: '#6f53e1' }}
+            className="auth-link"
           >
-            Sign Up
+            Create Account
           </Button>
         </div>
       </Card>

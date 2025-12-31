@@ -11,6 +11,7 @@ import Support from './pages/landing/Support';
 import JobRequirements from './pages/landing/JobRequirements';
 import LandingNavbar from './components/landing/Navbar';
 import LandingFooter from './components/landing/Footer';
+import ScrollToTop from './components/common/ScrollToTop';
 import { theme as landingTheme } from './pages/landing/theme';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -154,13 +155,14 @@ function App() {
         }}
       >
         <Router>
+          <ScrollToTop />
           <Routes>
             {/* Landing Page Routes (Public) */}
             <Route path="/" element={
               <ConfigProvider theme={landingTheme}>
-                <AntLayout style={{ minHeight: '100vh', background: '#fff' }}>
+                <AntLayout className="landing-bg">
                   <LandingNavbar />
-                  <AntLayout.Content>
+                  <AntLayout.Content className="page-transition">
                     <LandingPage />
                   </AntLayout.Content>
                   <LandingFooter />
@@ -169,9 +171,9 @@ function App() {
             } />
             <Route path="/pricing" element={
               <ConfigProvider theme={landingTheme}>
-                <AntLayout style={{ minHeight: '100vh', background: '#fff' }}>
+                <AntLayout className="landing-bg">
                   <LandingNavbar />
-                  <AntLayout.Content>
+                  <AntLayout.Content className="page-transition">
                     <Pricing />
                   </AntLayout.Content>
                   <LandingFooter />
@@ -180,9 +182,9 @@ function App() {
             } />
             <Route path="/support" element={
               <ConfigProvider theme={landingTheme}>
-                <AntLayout style={{ minHeight: '100vh', background: '#fff' }}>
+                <AntLayout className="landing-bg">
                   <LandingNavbar />
-                  <AntLayout.Content>
+                  <AntLayout.Content className="page-transition">
                     <Support />
                   </AntLayout.Content>
                   <LandingFooter />

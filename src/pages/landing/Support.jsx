@@ -6,7 +6,7 @@ const { Title, Paragraph } = Typography;
 
 const Support = () => {
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #f0f5ff 0%, #ffffff 100%)' }}>
+    <div style={{ minHeight: '100vh' }}> {/* Removed custom background */}
       {/* Header */}
       <div style={{ padding: 'clamp(60px, 10vw, 100px) 24px clamp(40px, 6vw, 60px)', textAlign: 'center' }}>
         <Title level={1} style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)', marginBottom: '16px' }}>
@@ -21,7 +21,7 @@ const Support = () => {
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px' }}>
         {/* Email Card */}
         <Card
-          className="glass-panel"
+          className="glass-panel-light"
           style={{
             borderRadius: '24px',
             border: 'none',
@@ -70,7 +70,7 @@ const Support = () => {
 
         {/* Google Form Section */}
         <Card
-          className="glass-panel"
+          className="glass-panel-light"
           style={{
             borderRadius: '24px',
             border: 'none',

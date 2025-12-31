@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Layout, Menu, Button, Drawer } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/landing/logo2.jpeg';
 import { Color } from 'antd/es/color-picker';
 
@@ -9,17 +9,41 @@ const { Header } = Layout;
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const getSelectedKey = () => {
+    const path = location.pathname;
+    if (path === '/') return 'home';
+    if (path === '/pricing') return 'pricing';
+    if (path === '/support') return 'support';
+    //if (path === '/job-requirements') return 'requirements';
+    if (path === '/about') return 'about';
+    return '';
+  };
+
+  const selectedKey = getSelectedKey();
 
   const menuItems = [
     { key: 'home', label: 'Home' },
     { key: 'pricing', label: 'Pricing' },
     { key: 'support', label: 'Support' },
+    { key: 'about', label: 'About Us' },
     //{ key: 'requirements', label: 'Job Requirements' },
   ];
 
+  const handleMenuClick = ({ key }) => {
+    if (key === 'home') navigate('/');
+    if (key === 'pricing') navigate('/pricing');
+    if (key === 'support') navigate('/support');
+    //if (key === 'requirements') navigate('/job-requirements');
+    // if (key === 'about') navigate('/about');
+    setMobileMenuOpen(false);
+  };
+
   return (
     <Header
+      className="glass-panel-light"
       style={{
         position: 'sticky',
         top: 0,
@@ -29,7 +53,6 @@ const Navbar = () => {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 24px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         height: '72px',
       }}
     >
@@ -41,13 +64,9 @@ const Navbar = () => {
       <div className="desktop-menu" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
         <Menu
           mode="horizontal"
+          selectedKeys={[selectedKey]}
           items={menuItems}
-          onClick={({ key }) => {
-            if (key === 'home') navigate('/');
-            if (key === 'pricing') navigate('/pricing');
-            if (key === 'support') navigate('/support');
-            if (key === 'requirements') navigate('/job-requirements');
-          }}
+          onClick={handleMenuClick}
           style={{
             borderBottom: 'none',
             minWidth: '500px',
@@ -80,14 +99,9 @@ const Navbar = () => {
       >
         <Menu
           mode="vertical"
+          selectedKeys={[selectedKey]}
           items={menuItems}
-          onClick={({ key }) => {
-            if (key === 'home') navigate('/');
-            if (key === 'pricing') navigate('/pricing');
-            if (key === 'support') navigate('/support');
-            if (key === 'requirements') navigate('/job-requirements');
-            setMobileMenuOpen(false);
-          }}
+          onClick={handleMenuClick}
           style={{ borderRight: 'none' }}
         />
         <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>

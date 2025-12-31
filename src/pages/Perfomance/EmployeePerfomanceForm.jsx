@@ -173,7 +173,7 @@ const EmployeePerformanceForm = () => {
         await createEmployeePerformance(payload);
         message.success("Performance created");
       }
-      navigate("/employee-performance");
+      navigate("/app/employee-performance");
     } catch (err) {
       console.error(err);
       message.error("Failed to save");
@@ -280,7 +280,7 @@ const EmployeePerformanceForm = () => {
 
       <div style={{ marginTop: 18, display: "flex", gap: 8 }}>
         <Space>
-          <Button onClick={() => navigate("/employee-performance")}>Cancel</Button>
+          <Button onClick={() => navigate("/app/employee-performance")}>Cancel</Button>
           <Button type="primary" loading={loading} onClick={submit}>
             {id ? "Update" : "Save"}
           </Button>

@@ -6,6 +6,7 @@ import { UserOutlined, LockOutlined, MailOutlined, BankOutlined, HomeOutlined } 
 import { signup, clearError } from '../store/slices/authSlice';
 import logo from '../assets/images/logo2.svg';
 import { useToast } from '../hooks/useToast';
+import './AuthStyles.css';
 
 const { Title, Text } = Typography;
 
@@ -34,85 +35,74 @@ const Signup = () => {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh', // Changed to minHeight for better scrolling on small screens
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#e6e9ff',
-        padding: '20px'
-      }}
-    >
+    <div className="auth-container landing-bg">
+
       <Button
         type="text"
         icon={<HomeOutlined />}
         onClick={() => navigate('/')}
-        style={{
-          position: 'absolute',
-          top: 20,
-          left: 20,
-          fontWeight: 600,
-          color: '#333'
-        }}
+        className="auth-back-btn"
       >
         Back to Home
       </Button>
+
       {contextHolder}
-      <Card
-        style={{
-          width: '100%',
-          maxWidth: 480, // Slightly wider for signup form
-          padding: '20px 20px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-          borderRadius: '6px',
-          backgroundColor: '#f7f7f7',
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+
+      <Card className="auth-card" bordered={false} style={{ width: '100%', maxWidth: 520 }}>
+        <div className="auth-header">
           <Image
-            width={220}
-            preview={false}
             src={logo}
-            style={{ marginBottom: 10 }}
+            preview={false}
+            className="auth-logo"
+            style={{ marginBottom: 0 }}
           />
-          <Title level={3} style={{ color: '#333', marginBottom: 5 }}>
-            Create Account
-          </Title>
-          <Text type="secondary">Get started with your free account</Text>
+          <Title level={3} className="auth-title">Create Account</Title>
+          <Text className="auth-subtitle">Get started with your free account</Text>
         </div>
 
-        <Form form={form} name="signup" onFinish={onFinish} autoComplete="off" layout="vertical" size="large">
+        <Form
+          form={form}
+          name="signup"
+          onFinish={onFinish}
+          autoComplete="off"
+          layout="vertical"
+          size="large"
+        >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="first_name"
+                label={<span className="auth-label">First Name</span>}
                 rules={[{ required: true, message: 'Please input your first name!' }]}
               >
-                <Input placeholder="First Name" />
+                <Input placeholder="John" className="auth-input" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 name="last_name"
+                label={<span className="auth-label">Last Name</span>}
                 rules={[{ required: true, message: 'Please input your last name!' }]}
               >
-                <Input placeholder="Last Name" />
+                <Input placeholder="Doe" className="auth-input" />
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item
             name="company_name"
+            label={<span className="auth-label">Company Name</span>}
           >
             <Input
               prefix={<BankOutlined />}
-              placeholder="Company Name (Optional)"
+              placeholder="Company Name"
+              className="auth-input"
             />
           </Form.Item>
 
           <Form.Item
             name="email"
+            label={<span className="auth-label">Work Email</span>}
             rules={[
               { required: true, message: 'Please input your email!' },
               { type: 'email', message: 'Please enter a valid email!' },
@@ -120,22 +110,26 @@ const Signup = () => {
           >
             <Input
               prefix={<MailOutlined />}
-              placeholder="Email Address"
+              placeholder="name@company.com"
+              className="auth-input"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
+            label={<span className="auth-label">Password</span>}
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Password"
+              placeholder="Create a strong password"
+              className="auth-input"
             />
           </Form.Item>
 
           <Form.Item
             name="confirm_password"
+            label={<span className="auth-label">Confirm Password</span>}
             dependencies={['password']}
             hasFeedback
             rules={[
@@ -152,31 +146,34 @@ const Signup = () => {
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Confirm Password"
+              placeholder="Confirm your password"
+              className="auth-input"
             />
           </Form.Item>
 
-          <Form.Item>
+          <Form.Item style={{ marginTop: 10 }}>
             <Button
               type="primary"
               htmlType="submit"
               loading={loading}
               block
-              style={{
-                backgroundColor: '#6f53e1',
-                borderColor: '#6f53e1',
-                fontWeight: 600,
-              }}
+              className="auth-submit-btn"
             >
               Sign Up
             </Button>
           </Form.Item>
-
-          <div style={{ textAlign: 'center' }}>
-            <Text>Already have an account? </Text>
-            <Link to="/login" style={{ color: '#6f53e1', fontWeight: 600 }}>Log In</Link>
-          </div>
         </Form>
+
+        <div className="auth-footer">
+          <Text>Already have an account? </Text>
+          <Button
+            type="link"
+            onClick={() => navigate('/login')}
+            className="auth-link"
+          >
+            Log In
+          </Button>
+        </div>
       </Card>
     </div>
   );

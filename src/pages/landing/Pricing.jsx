@@ -33,7 +33,7 @@ const Pricing = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #f0f5ff 0%, #ffffff 100%)' }}>
+    <div style={{ minHeight: '100vh' }}> {/* Removed custom background */}
       {/* Header */}
       <div style={{ padding: 'clamp(60px, 10vw, 100px) 24px clamp(40px, 6vw, 60px)', textAlign: 'center' }}>
         <Title level={1} style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)', marginBottom: '16px' }}>
@@ -71,7 +71,7 @@ const Pricing = () => {
             {plans.map((plan) => (
               <Col xs={24} sm={12} lg={6} key={plan.id}>
                 <Card
-                  className="pricing-card"
+                  className="pricing-card glass-panel-light"
                   style={{
                     height: '100%',
                     borderRadius: '24px',

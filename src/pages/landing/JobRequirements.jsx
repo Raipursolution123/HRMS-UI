@@ -99,7 +99,7 @@ const JobRequirements = () => {
   };
 
   const handleSubmitApplication = (values) => {
-   // console.log('Application submitted:', values);
+    // console.log('Application submitted:', values);
     message.success('Application submitted successfully! We will contact you soon.');
     setApplyModalVisible(false);
     form.resetFields();
@@ -119,7 +119,7 @@ const JobRequirements = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #f0f5ff 0%, #ffffff 100%)' }}>
+    <div className="landing-bg"> {/* Updated to use shared animated background */}
       {/* Header */}
       <div style={{ padding: 'clamp(60px, 10vw, 100px) 24px clamp(40px, 6vw, 60px)', textAlign: 'center', position: 'relative' }}>
         {/* Back to Home Button */}
@@ -156,19 +156,19 @@ const JobRequirements = () => {
         {/* Stats */}
         <Row gutter={[24, 24]} justify="center" style={{ maxWidth: '800px', margin: '0 auto 40px' }}>
           <Col xs={8}>
-            <Card className="glass-panel" style={{ borderRadius: '16px', border: 'none', textAlign: 'center' }}>
+            <Card className="glass-panel-light" style={{ borderRadius: '16px', border: 'none', textAlign: 'center' }}>
               <Title level={2} style={{ margin: 0, color: '#1677ff' }}>{jobListings.filter(j => j.status === 'PUBLISHED').length}</Title>
               <Text type="secondary">Open Positions</Text>
             </Card>
           </Col>
           <Col xs={8}>
-            <Card className="glass-panel" style={{ borderRadius: '16px', border: 'none', textAlign: 'center' }}>
+            <Card className="glass-panel-light" style={{ borderRadius: '16px', border: 'none', textAlign: 'center' }}>
               <Title level={2} style={{ margin: 0, color: '#52c41a' }}>{departments.length - 1}</Title>
               <Text type="secondary">Departments</Text>
             </Card>
           </Col>
           <Col xs={8}>
-            <Card className="glass-panel" style={{ borderRadius: '16px', border: 'none', textAlign: 'center' }}>
+            <Card className="glass-panel-light" style={{ borderRadius: '16px', border: 'none', textAlign: 'center' }}>
               <Title level={2} style={{ margin: 0, color: '#722ed1' }}>{locations.length - 1}</Title>
               <Text type="secondary">Locations</Text>
             </Card>
@@ -177,7 +177,7 @@ const JobRequirements = () => {
 
         {/* Search and Filters */}
         <Card
-          className="glass-panel"
+          className="glass-panel-light"
           style={{
             maxWidth: '1000px',
             margin: '0 auto',
@@ -244,7 +244,7 @@ const JobRequirements = () => {
           {filteredJobs.map((job) => (
             <Col xs={24} lg={12} key={job.id}>
               <Card
-                className="pricing-card"
+                className="pricing-card glass-panel-light"
                 style={{
                   borderRadius: '24px',
                   border: '1px solid #f0f0f0',

@@ -46,10 +46,10 @@ const features = [
 
 const Features = () => {
   return (
-    <div style={{ padding: 'clamp(40px, 8vw, 100px) 24px', background: '#ffffff' }}>
+    <div style={{ padding: 'clamp(40px, 8vw, 100px) 24px' }}> {/* Removed background: #ffffff */}
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 'clamp(40px, 8vw, 80px)' }}>
-          <Title level={2} style={{ fontSize: 'clamp(1.75rem, 5vw, 2.5rem)' }}>Everything you need to manage your team</Title>
+          <Title level={2} style={{ fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', marginBottom: '16px' }}>Everything you need to manage your team</Title>
           <Paragraph style={{ fontSize: 'clamp(1rem, 2vw, 1.1rem)', color: '#64748b', maxWidth: '700px', margin: '0 auto' }}>
             Our platform brings together all the tools you need to hire, pay, and manage your workforce in one easy-to-use system.
           </Paragraph>
@@ -59,8 +59,8 @@ const Features = () => {
           {features.map((feature, index) => (
             <Col xs={24} sm={12} lg={8} key={index}>
               <Card
-                className="feature-card"
-                style={{ height: '100%', borderRadius: '24px', border: 'none' }}
+                className="feature-card glass-panel-light"
+                style={{ height: '100%', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.6)' }}
                 bodyStyle={{ padding: 'clamp(24px, 4vw, 40px) clamp(20px, 3vw, 32px)' }}
               >
                 <div style={{

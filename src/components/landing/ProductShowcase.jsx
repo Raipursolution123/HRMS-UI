@@ -45,7 +45,7 @@ const ProductShowcase = () => {
   const currentItem = items.find(item => item.key === activeTab);
 
   return (
-    <div style={{ padding: 'clamp(40px, 8vw, 100px) 24px', background: '#f8fafc' }}>
+    <div id="product-showcase" style={{ padding: 'clamp(40px, 8vw, 100px) 24px' }}> {/* Removed background: #f8fafc */}
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 6vw, 64px)' }}>
           <Title level={2} style={{ fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', marginBottom: '16px' }}>
@@ -67,7 +67,7 @@ const ProductShowcase = () => {
           className="showcase-tabs"
         />
 
-        <div className="glass-panel showcase-content" style={{
+        <div className="glass-panel-light showcase-content" style={{
           padding: 'clamp(24px, 5vw, 48px)',
           borderRadius: 'clamp(16px, 4vw, 32px)'
         }}>
