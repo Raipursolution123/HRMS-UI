@@ -1,8 +1,7 @@
 /* Merged Landing Page Styles */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* Scoping these styles to landing page wrapper if possible, or using specific classes */
-/* For now, adding them globally but using specific classes where possible */
+
 
 .landing-wrapper {
   font-family: 'Poppins', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -47,8 +46,6 @@
 }
 
 
-/* Glass Panel Light - for content on top of light background */
-/* Enhancing existing glass-panel if it exists or adding new */
 .glass-panel-light {
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(16px);

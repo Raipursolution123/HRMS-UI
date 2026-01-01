@@ -107,14 +107,6 @@ const Login = () => {
   return (
     <div className="auth-container landing-bg">
 
-      <Button
-        type="text"
-        icon={<HomeOutlined />}
-        onClick={() => navigate('/')}
-        className="auth-back-btn"
-      >
-        Back to Home
-      </Button>
 
       {contextHolder}
 
@@ -135,7 +127,7 @@ const Login = () => {
           onFinish={onFinish}
           autoComplete="off"
           layout="vertical"
-          size="large"
+          size="middle" /* Changed from large */
         >
           <Form.Item
             name="email"
@@ -164,7 +156,7 @@ const Login = () => {
             />
           </Form.Item>
 
-          <Form.Item style={{ marginTop: 20 }}>
+          <Form.Item style={{ marginTop: 15 }}> {/* Reduced from 20 */}
             <Button
               type="primary"
               htmlType="submit"

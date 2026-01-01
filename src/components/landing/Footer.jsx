@@ -48,7 +48,7 @@ const Footer = () => {
             <Space direction="vertical" size="middle">
               <Link onClick={(e) => scrollToSection(e, 'product-showcase')} style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Features</Link>
               <Link onClick={() => navigate('/pricing')} style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Pricing</Link>
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Security</Link>
+              {/*<Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Security</Link>*/}
               {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Integrations</Link> */}
             </Space>
           </Col>

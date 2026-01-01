@@ -37,14 +37,7 @@ const Signup = () => {
   return (
     <div className="auth-container landing-bg">
 
-      <Button
-        type="text"
-        icon={<HomeOutlined />}
-        onClick={() => navigate('/')}
-        className="auth-back-btn"
-      >
-        Back to Home
-      </Button>
+     
 
       {contextHolder}
 
@@ -66,14 +59,15 @@ const Signup = () => {
           onFinish={onFinish}
           autoComplete="off"
           layout="vertical"
-          size="large"
+          size="middle"
         >
-          <Row gutter={16}>
+          <Row gutter={12}> 
             <Col span={12}>
               <Form.Item
                 name="first_name"
                 label={<span className="auth-label">First Name</span>}
                 rules={[{ required: true, message: 'Please input your first name!' }]}
+                style={{ marginBottom: 10 }}
               >
                 <Input placeholder="John" className="auth-input" />
               </Form.Item>
@@ -83,75 +77,90 @@ const Signup = () => {
                 name="last_name"
                 label={<span className="auth-label">Last Name</span>}
                 rules={[{ required: true, message: 'Please input your last name!' }]}
+                style={{ marginBottom: 10 }}
               >
                 <Input placeholder="Doe" className="auth-input" />
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item
-            name="company_name"
-            label={<span className="auth-label">Company Name</span>}
-          >
-            <Input
-              prefix={<BankOutlined />}
-              placeholder="Company Name"
-              className="auth-input"
-            />
-          </Form.Item>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                name="company_name"
+                label={<span className="auth-label">Company Name</span>}
+                style={{ marginBottom: 10 }}
+              >
+                <Input
+                  prefix={<BankOutlined />}
+                  placeholder="Company"
+                  className="auth-input"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="email"
+                label={<span className="auth-label">Work Email</span>}
+                style={{ marginBottom: 10 }}
+                rules={[
+                  { required: true, message: 'Please input your email!' },
+                  { type: 'email', message: 'Please enter a valid email!' },
+                ]}
+              >
+                <Input
+                  prefix={<MailOutlined />}
+                  placeholder="name@company.com"
+                  className="auth-input"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            name="email"
-            label={<span className="auth-label">Work Email</span>}
-            rules={[
-              { required: true, message: 'Please input your email!' },
-              { type: 'email', message: 'Please enter a valid email!' },
-            ]}
-          >
-            <Input
-              prefix={<MailOutlined />}
-              placeholder="name@company.com"
-              className="auth-input"
-            />
-          </Form.Item>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                name="password"
+                label={<span className="auth-label">Password</span>}
+                style={{ marginBottom: 10 }}
+                rules={[{ required: true, message: 'Please input your password!' }]}
+              >
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  placeholder="Password"
+                  className="auth-input"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="confirm_password"
+                label={<span className="auth-label">Confirm Password</span>}
+                style={{ marginBottom: 10 }}
+                dependencies={['password']}
+                hasFeedback
+                rules={[
+                  { required: true, message: 'Please confirm your password!' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('The two passwords that you entered do not match!'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  placeholder="Confirm"
+                  className="auth-input"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            name="password"
-            label={<span className="auth-label">Password</span>}
-            rules={[{ required: true, message: 'Please input your password!' }]}
-          >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="Create a strong password"
-              className="auth-input"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="confirm_password"
-            label={<span className="auth-label">Confirm Password</span>}
-            dependencies={['password']}
-            hasFeedback
-            rules={[
-              { required: true, message: 'Please confirm your password!' },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('The two passwords that you entered do not match!'));
-                },
-              }),
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="Confirm your password"
-              className="auth-input"
-            />
-          </Form.Item>
-
-          <Form.Item style={{ marginTop: 10 }}>
+          <Form.Item style={{ marginBottom: 0, marginTop: 5 }}>
             <Button
               type="primary"
               htmlType="submit"

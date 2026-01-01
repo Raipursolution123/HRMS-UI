@@ -105,7 +105,10 @@ const Navbar = () => {
           style={{ borderRight: 'none' }}
         />
         <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <Button block onClick={() => navigate('/login')}>Sign In</Button>
+          <Button block onClick={() => {
+            navigate('/login');
+            setMobileMenuOpen(false);
+          }}>Sign In</Button>
           {/* <Button type="primary" block>Book a Demo</Button> */}
         </div>
       </Drawer>

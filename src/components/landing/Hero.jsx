@@ -25,7 +25,7 @@ const { Title, Paragraph, Text } = Typography;
 
 const slides = [slide1, slide2, slide3, slide4];
 
-const CustomArrow = ({ className, style, onClick, direction }) => (
+/*const CustomArrow = ({ className, style, onClick, direction }) => (
   <div
     className={className}
     style={{
@@ -48,7 +48,7 @@ const CustomArrow = ({ className, style, onClick, direction }) => (
   >
     {direction === 'next' ? <RightOutlined /> : <LeftOutlined />}
   </div>
-);
+);*/
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ const Hero = () => {
 
   return (
     <div id="hero-section" style={{
-      padding: 'clamp(40px, 8vw, 100px) 0',
+      padding: '0',
       overflow: 'hidden'
     }}>
      
@@ -75,9 +75,8 @@ const Hero = () => {
       <div style={{ marginBottom: '80px', animation: 'fadeInUp 1s ease', position: 'relative' }}>
         <Carousel
           autoplay
-          prevArrow={<CustomArrow direction="prev" />}
-          nextArrow={<CustomArrow direction="next" />}
           autoplaySpeed={4000}
+          arrows={true}
           dots={{ className: "custom-dots" }}
           slidesToShow={1}
           infinite
@@ -175,9 +174,9 @@ const Hero = () => {
                           rules={[{ required: true, message: 'Required' }]}
                         >
                           <Select placeholder="Employees">
-                            <Select.Option value="1-10">1-10</Select.Option>
-                            <Select.Option value="11-50">11-50</Select.Option>
-                            <Select.Option value="51-200">51-200</Select.Option>
+                            <Select.Option value="1-10">5-50</Select.Option>
+                            <Select.Option value="11-50">50-100</Select.Option>
+                            <Select.Option value="51-200">100-200</Select.Option>
                             <Select.Option value="200+">200+</Select.Option>
                           </Select>
                         </Form.Item>

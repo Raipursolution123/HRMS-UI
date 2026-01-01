@@ -198,8 +198,28 @@ function App() {
             } />
 
             {/* App Routes (Protected) */}
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={
+              <ConfigProvider theme={landingTheme}>
+                <AntLayout className="landing-bg">
+                  <LandingNavbar />
+                  <AntLayout.Content className="page-transition">
+                    <Signup />
+                  </AntLayout.Content>
+                  
+                </AntLayout>
+              </ConfigProvider>
+            } />
+            <Route path="/login" element={
+              <ConfigProvider theme={landingTheme}>
+                <AntLayout className="landing-bg">
+                  <LandingNavbar />
+                  <AntLayout.Content className="page-transition">
+                    <Login />
+                  </AntLayout.Content>
+                  
+                </AntLayout>
+              </ConfigProvider>
+            } />
             <Route path="/app" element={
               <ProtectedRoute>
                 <MainLayout />
