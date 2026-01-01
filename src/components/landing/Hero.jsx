@@ -120,8 +120,8 @@ const Hero = () => {
                     <Title level={2} style={{ margin: 0, color: '#1e293b' }}>
                       Register <span className="gradient-text">Yourself</span>
                     </Title>
-                    <Paragraph style={{ color: '#64748b' }}>
-                      Register for managing HR better.
+                    <Paragraph style={{ color: '#e91111ff' }}>
+                      If you are new here please register yourself!.
                     </Paragraph>
                   </div>
 
