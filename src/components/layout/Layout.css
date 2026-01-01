@@ -222,7 +222,35 @@
 .hrms-header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
+}
+
+/* Notification Popover Styles */
+.notification-popover .ant-popover-inner {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.notification-item:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.notification-item.unread {
+  background-color: #f0f7ff !important;
+}
+
+.notification-item.unread:hover {
+  background-color: #e6f4ff !important;
+}
+
+.notification-badge .ant-badge-count {
+  box-shadow: 0 0 0 1px #1e1b4b;
+}
+
+.hrms-header-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .hrms-header-user-dropdown {
@@ -361,6 +389,10 @@
     margin: 0 12px 12px 12px;
     padding: 12px;
     border-radius: 12px;
+  }
+
+  .notification-container {
+    width: 280px !important;
   }
 }
 

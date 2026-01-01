@@ -19,6 +19,7 @@ import {
   UserOutlined,
   HomeOutlined,
   RocketOutlined,
+  LockOutlined
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
@@ -28,6 +29,7 @@ import { useToast } from '../../hooks/useToast';
 import ErrorBoundary from 'antd/es/alert/ErrorBoundary';
 import { getIconComponent } from '../../constants/menuItem';
 import PlanPurchasePopup from '../popupmessage/PlanPurchasePopup';
+import NotificationPopover from '../popupmessage/NotificationPopover';
 import './Layout.css';
 
 const { Header, Sider, Content } = Layout;
@@ -200,11 +202,23 @@ const MainLayout = () => {
     },
 
     {
+      key: 'change-password',
+      icon: <LockOutlined />,
+      label: 'Change Password',
+      onClick: () => {
+        navigate(`/app/change-password`);
+      },
+    },
+
+    {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: 'Logout',
       onClick: handleLogout,
     },
+
+
+
   ];
 
   const breadcrumbItems = location.pathname.split('/').filter(i => i).map((i, index, arr) => ({
@@ -346,7 +360,9 @@ const MainLayout = () => {
               style={{ fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               title="Upgrade Plan"
             />
-            <ThemeToggle />
+
+            <NotificationPopover userProfile={profile} />
+
             <Dropdown
               menu={{ items: userMenuItems }}
               placement="bottomRight"

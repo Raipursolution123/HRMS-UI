@@ -227,12 +227,12 @@ function App() {
             }>
               <Route index element={<Dashboard />} />
               <Route path='my-profile' element={<ViewUserProfile />} />
+              <Route path='change-password' element={<ChangePassword />} />
               <Route path='administration'>
                 <Route path='manage-role' >
                   <Route path='add-role' element={<AddRole />} />
                   <Route path='add-role-permission' element={<AddPermission />} />
                 </Route>
-                <Route path='change-password' element={<ChangePassword />} />
               </Route>
               <Route path='employee-management'>
                 <Route path='department' element={<Department />} />
@@ -243,7 +243,8 @@ function App() {
                   <Route path='create' element={<AddEmployeeForm />} />
                   <Route path='edit/:id' element={<AddEmployeeForm />} />
                   <Route path='profile/:id' element={<Profile />} />
-                </Route>              <Route path='termination' element={<Termination />} />
+                </Route>              
+                <Route path='termination' element={<Termination />} />
                 <Route path='promotion' element={<Promotion />} />
                 <Route path='employee-permanent' element={<EmployeePermanent />} />
                 <Route path='warning' element={<Warning />} />
