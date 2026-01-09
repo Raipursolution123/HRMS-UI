@@ -30,6 +30,7 @@ import ErrorBoundary from 'antd/es/alert/ErrorBoundary';
 import { getIconComponent } from '../../constants/menuItem';
 import PlanPurchasePopup from '../popupmessage/PlanPurchasePopup';
 import NotificationPopover from '../popupmessage/NotificationPopover';
+import PlanSelectionPopup from '../popupmessage/PlanSelectionPopup';
 import './Layout.css';
 
 const { Header, Sider, Content } = Layout;
@@ -59,6 +60,7 @@ const MainLayout = () => {
   const screens = useBreakpoint();
   const { Toast, contextHolder } = useToast();
   const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const [showPlanSelection, setShowPlanSelection] = useState(false);
 
   useEffect(() => {
     const planId = localStorage.getItem('selected_plan_id');
@@ -95,6 +97,22 @@ const MainLayout = () => {
     return transformToMenuItems(data);
   }, [role]);
 
+  const selectedKey = useMemo(() => {
+    const { pathname } = location;
+
+
+    if (pathname === '/app' || pathname === '/app/') {
+      return '/';
+    }
+
+
+    if (pathname.startsWith('/app/')) {
+      return pathname.replace('/app', '');
+    }
+
+    return pathname;
+  }, [location.pathname]);
+
   const handleMenuClick = ({ key }) => {
     // If key is exactly '/', navigate to '/app' (Dashboard)
     if (key === '/') {
@@ -102,31 +120,25 @@ const MainLayout = () => {
       return;
     }
 
-    // If key has a leading slash but no /app prefix, prepend /app
-    // This handles routes like /employee-management -> /app/employee-management
     const targetPath = (key.startsWith('/') && !key.startsWith('/app'))
       ? `/app${key}`
       : key;
 
     navigate(targetPath);
-    // Close drawer on mobile when menu item is clicked
+
     if (!screens.lg) {
       setCollapsed(true);
     }
   };
 
-  // Handle submenu open/close - accordion behavior at ALL levels
   const onOpenChange = (keys) => {
-    // Find which key was just opened (the one that's new in the keys array)
     const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
 
     if (!latestOpenKey) {
-      // A menu was closed, just update the keys
       setOpenKeys(keys);
       return;
     }
 
-    // Helper function to get all submenu keys from menu items recursively
     const getAllSubmenuKeys = (items) => {
       let allKeys = [];
       items.forEach(item => {
@@ -138,12 +150,9 @@ const MainLayout = () => {
       return allKeys;
     };
 
-    // Get all possible submenu keys
     const allSubmenuKeys = getAllSubmenuKeys(sidebarMenuItems);
 
-    // If the opened key is a submenu
     if (allSubmenuKeys.includes(latestOpenKey)) {
-      // Find parent path for the opened key
       const findParentKey = (items, targetKey, parent = null) => {
         for (const item of items) {
           if (item.key === targetKey) {
@@ -159,12 +168,7 @@ const MainLayout = () => {
 
       const parentKey = findParentKey(sidebarMenuItems, latestOpenKey);
 
-      // Filter keys to only keep:
-      // 1. The newly opened key
-      // 2. All parent keys in the path to root
       const newOpenKeys = [latestOpenKey];
-
-      // Add all parent keys by walking up the tree
       let currentParent = parentKey;
       while (currentParent) {
         newOpenKeys.push(currentParent);
@@ -173,7 +177,6 @@ const MainLayout = () => {
 
       setOpenKeys(newOpenKeys);
     } else {
-      // Not a submenu, shouldn't happen but handle it
       setOpenKeys(keys);
     }
   };
@@ -189,6 +192,11 @@ const MainLayout = () => {
         navigate('/login');
       }, 300);
     }
+  };
+
+  const handleRoleSelection = (plan) => {
+    setShowPlanSelection(false);
+    setSelectedPlanId(plan.id);
   };
 
   const userMenuItems = [
@@ -292,12 +300,12 @@ const MainLayout = () => {
         )}
       </div>
       <div className="hrms-sidebar-logo">
-        {collapsed && screens.lg ? 'HR' : 'HRMS'}
+        {collapsed && screens.lg ? 'HR' : 'IntelliHR'}
       </div>
       <Menu
         theme="dark"
         mode="inline"
-        selectedKeys={[location.pathname]}
+        selectedKeys={[selectedKey]}
         openKeys={openKeys}
         onOpenChange={onOpenChange}
         items={sidebarMenuItems}
@@ -311,6 +319,11 @@ const MainLayout = () => {
     <Layout style={{ height: '100vh', overflow: 'hidden' }}>
       {contextHolder}
       <PlanPurchasePopup planId={selectedPlanId} onClose={() => setSelectedPlanId(null)} />
+      <PlanSelectionPopup
+        open={showPlanSelection}
+        onClose={() => setShowPlanSelection(false)}
+        onSelectPlan={handleRoleSelection}
+      />
 
       {/* Mobile Drawer */}
       {!screens.lg && (
@@ -356,7 +369,7 @@ const MainLayout = () => {
             <Button
               type="text"
               icon={<RocketOutlined style={{ color: '#fa8c16' }} />}
-              onClick={() => navigate('/pricing')}
+              onClick={() => setShowPlanSelection(true)}
               style={{ fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               title="Upgrade Plan"
             />

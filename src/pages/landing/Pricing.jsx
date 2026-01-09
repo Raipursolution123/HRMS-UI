@@ -33,8 +33,7 @@ const Pricing = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh' }}> {/* Removed custom background */}
-      {/* Header */}
+    <div style={{ minHeight: '100vh' }}> 
       <div style={{ padding: 'clamp(60px, 10vw, 100px) 24px clamp(40px, 6vw, 60px)', textAlign: 'center' }}>
         <Title level={1} style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)', marginBottom: '16px' }}>
           Choose the <span className="gradient-text">Perfect Plan</span> for Your Team
@@ -44,7 +43,7 @@ const Pricing = () => {
         </Paragraph>
       </div>
 
-      {/* Pricing Cards */}
+
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px 80px' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '100px 0' }}>
@@ -194,15 +193,7 @@ const Pricing = () => {
         )}
 
 
-        <div style={{ textAlign: 'center', marginTop: '80px' }}>
-          <Title level={3} style={{ marginBottom: '16px' }}>Need a custom plan?</Title>
-          <Paragraph style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '24px' }}>
-            Contact our sales team for enterprise solutions tailored to your needs.
-          </Paragraph>
-          <Button type="primary" size="large" style={{ height: '56px', padding: '0 40px', fontSize: '18px', borderRadius: '12px' }}>
-            Contact Sales
-          </Button>
-        </div>
+
       </div>
     </div>
   );

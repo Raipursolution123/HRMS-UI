@@ -12,6 +12,7 @@
     "antd": "^5.28.0",
     "axios": "^1.13.2",
     "dayjs": "^1.11.9",
+    "framer-motion": "^12.24.10",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
     "moment": "^2.30.1",

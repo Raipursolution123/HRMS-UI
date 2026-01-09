@@ -6,9 +6,7 @@ import {
   getPayslip
 } from '../services/salaryService';
 
-/**
- * Hook to fetch salary sheets list
- */
+
 export const useSalarySheets = (initialFilters = {}) => {
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -58,9 +56,7 @@ export const useSalarySheets = (initialFilters = {}) => {
   };
 };
 
-/**
- * Hook to generate single payslip
- */
+
 export const useGeneratePayslip = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -86,9 +82,7 @@ export const useGeneratePayslip = () => {
   return { generate, loading, error, result };
 };
 
-/**
- * Hook to generate bulk payslips
- */
+
 export const useGenerateBulkPayslip = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -114,9 +108,7 @@ export const useGenerateBulkPayslip = () => {
   return { generateBulk, loading, error, result };
 };
 
-/**
- * Hook to fetch single payslip details
- */
+
 export const usePayslip = (id) => {
   const [payslip, setPayslip] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -143,9 +135,7 @@ export const usePayslip = (id) => {
   return { payslip, loading, error, refetch: fetchPayslip };
 };
 
-/**
- * Hook to mark salary as paid
- */
+
 export const useMarkSalaryPaid = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

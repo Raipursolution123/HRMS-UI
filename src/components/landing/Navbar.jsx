@@ -18,7 +18,7 @@ const Navbar = () => {
     if (path === '/pricing') return 'pricing';
     if (path === '/support') return 'support';
     //if (path === '/job-requirements') return 'requirements';
-    if (path === '/about') return 'about';
+    if (path === '/about-us') return 'about';
     return '';
   };
 
@@ -36,8 +36,8 @@ const Navbar = () => {
     if (key === 'home') navigate('/');
     if (key === 'pricing') navigate('/pricing');
     if (key === 'support') navigate('/support');
-    //if (key === 'requirements') navigate('/job-requirements');
-    // if (key === 'about') navigate('/about');
+    if (key === 'requirements') navigate('/job-requirements');
+    if (key === 'about') navigate('/about-us');
     setMobileMenuOpen(false);
   };
 

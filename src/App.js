@@ -8,6 +8,7 @@ import MainLayout from './components/layout/Layout';
 import LandingPage from './pages/landing/LandingPage';
 import Pricing from './pages/landing/Pricing';
 import Support from './pages/landing/Support';
+import AboutUs from './pages/landing/AboutUs';
 import JobRequirements from './pages/landing/JobRequirements';
 import LandingNavbar from './components/landing/Navbar';
 import LandingFooter from './components/landing/Footer';
@@ -191,6 +192,17 @@ function App() {
                 </AntLayout>
               </ConfigProvider>
             } />
+            <Route path="/about-us" element={
+              <ConfigProvider theme={landingTheme}>
+                <AntLayout className="landing-bg">
+                  <LandingNavbar />
+                  <AntLayout.Content className="page-transition">
+                    <AboutUs />
+                  </AntLayout.Content>
+                  <LandingFooter />
+                </AntLayout>
+              </ConfigProvider>
+            } />
             <Route path="/job-requirements" element={
               <ConfigProvider theme={landingTheme}>
                 <JobRequirements />
@@ -205,7 +217,7 @@ function App() {
                   <AntLayout.Content className="page-transition">
                     <Signup />
                   </AntLayout.Content>
-                  
+
                 </AntLayout>
               </ConfigProvider>
             } />
@@ -216,7 +228,7 @@ function App() {
                   <AntLayout.Content className="page-transition">
                     <Login />
                   </AntLayout.Content>
-                  
+
                 </AntLayout>
               </ConfigProvider>
             } />
@@ -243,7 +255,7 @@ function App() {
                   <Route path='create' element={<AddEmployeeForm />} />
                   <Route path='edit/:id' element={<AddEmployeeForm />} />
                   <Route path='profile/:id' element={<Profile />} />
-                </Route>              
+                </Route>
                 <Route path='termination' element={<Termination />} />
                 <Route path='promotion' element={<Promotion />} />
                 <Route path='employee-permanent' element={<EmployeePermanent />} />

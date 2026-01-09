@@ -56,7 +56,7 @@ const Footer = () => {
           <Col xs={12} sm={8} md={5}>
             <Title level={5} style={{ marginBottom: '24px', fontSize: 'clamp(1rem, 2.5vw, 1.1rem)' }}>Company</Title>
             <Space direction="vertical" size="middle">
-              <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>About Us</Link>
+              <Link onClick={() => navigate('/about-us')} style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>About Us</Link>
               {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Careers</Link> */}
               {/* <Link href="#" style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Blog</Link> */}
               <Link onClick={(e) => scrollToSection(e, 'hero-section')} style={{ color: '#64748b', fontSize: 'clamp(14px, 2vw, 16px)' }}>Contact</Link>

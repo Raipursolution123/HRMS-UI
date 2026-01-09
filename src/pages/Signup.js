@@ -37,8 +37,6 @@ const Signup = () => {
   return (
     <div className="auth-container landing-bg">
 
-     
-
       {contextHolder}
 
       <Card className="auth-card" bordered={false} style={{ width: '100%', maxWidth: 520 }}>

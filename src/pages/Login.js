@@ -118,7 +118,7 @@ const Login = () => {
             className="auth-logo"
           />
           <Title level={3} className="auth-title">Welcome Back</Title>
-          <Text className="auth-subtitle">Log in to your HRMS dashboard</Text>
+          <Text className="auth-subtitle">Log in to your IntelliHR dashboard</Text>
         </div>
 
         <Form

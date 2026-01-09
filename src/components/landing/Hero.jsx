@@ -12,9 +12,13 @@ import {
   SafetyCertificateOutlined,
   SolutionOutlined,
   LeftOutlined,
-  RightOutlined
+  RightOutlined,
+  LockOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { signup } from '../../store/slices/authSlice';
+import { useToast } from '../../hooks/useToast';
 import heroIllustration from '../../assets/landing/hero-illustration.png';
 import slide1 from '../../assets/landing/slide1.png';
 import slide2 from '../../assets/landing/slide2.png';
@@ -52,16 +56,21 @@ const slides = [slide1, slide2, slide3, slide4];
 
 const Hero = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const { loading } = useSelector((state) => state.auth);
+  const { Toast, contextHolder } = useToast();
 
-  const onFinish = (values) => {
-    console.log('Registration Success:', values);
-    // Simulate API call
-    setTimeout(() => {
+  const onFinish = async (values) => {
+    try {
+      const { confirm_password, ...payload } = values;
+      await dispatch(signup(payload)).unwrap();
       setFormSubmitted(true);
-      message.success('Registration successful!');
-    }, 1000);
+      Toast.success('Registration successful!');
+    } catch (error) {
+      Toast.error(error || 'Registration failed. Please try again.');
+    }
   };
 
   return (
@@ -69,9 +78,9 @@ const Hero = () => {
       padding: '0',
       overflow: 'hidden'
     }}>
-     
+      {contextHolder}
 
-      {/* Featured Slider - Now Truly Full Width */}
+
       <div style={{ marginBottom: '80px', animation: 'fadeInUp 1s ease', position: 'relative' }}>
         <Carousel
           autoplay
@@ -121,7 +130,7 @@ const Hero = () => {
                       Register <span className="gradient-text">Yourself</span>
                     </Title>
                     <Paragraph style={{ color: '#e91111ff' }}>
-                      If you are new here please register yourself!.
+                      If you are new here please register yourself fast!
                     </Paragraph>
                   </div>
 
@@ -131,12 +140,24 @@ const Hero = () => {
                     onFinish={onFinish}
                     size="large"
                   >
-                    <Form.Item
-                      name="full_name"
-                      rules={[{ required: true, message: 'Please enter your name' }]}
-                    >
-                      <Input placeholder="Full Name" prefix={<UserAddOutlined style={{ color: '#94a3b8' }} />} />
-                    </Form.Item>
+                    <Row gutter={12}>
+                      <Col span={12}>
+                        <Form.Item
+                          name="first_name"
+                          rules={[{ required: true, message: 'First name is required' }]}
+                        >
+                          <Input placeholder="First Name" prefix={<UserAddOutlined style={{ color: '#94a3b8' }} />} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item
+                          name="last_name"
+                          rules={[{ required: true, message: 'Last name is required' }]}
+                        >
+                          <Input placeholder="Last Name" prefix={<UserAddOutlined style={{ color: '#94a3b8' }} />} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
                     <Form.Item
                       name="phone"
@@ -159,29 +180,53 @@ const Hero = () => {
                       <Input placeholder="Work Email" prefix={<span style={{ color: '#94a3b8' }}>✉️</span>} />
                     </Form.Item>
 
-                    <Row gutter={16}>
-                      <Col span={14}>
-                        <Form.Item
-                          name="company_name"
-                          rules={[{ required: true, message: 'Company name is required' }]}
-                        >
-                          <Input placeholder="Company Name" prefix={<TeamOutlined style={{ color: '#94a3b8' }} />} />
-                        </Form.Item>
-                      </Col>
-                      <Col span={10}>
-                        <Form.Item
-                          name="employee_count"
-                          rules={[{ required: true, message: 'Required' }]}
-                        >
-                          <Select placeholder="Employees">
-                            <Select.Option value="1-10">5-50</Select.Option>
-                            <Select.Option value="11-50">50-100</Select.Option>
-                            <Select.Option value="51-200">100-200</Select.Option>
-                            <Select.Option value="200+">200+</Select.Option>
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                    </Row>
+
+
+                    <Form.Item
+                      name="company_name"
+                      rules={[{ required: true, message: 'Company name is required' }]}
+                    >
+                      <Input placeholder="Company Name" prefix={<TeamOutlined style={{ color: '#94a3b8' }} />} />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="password"
+                      style={{ marginBottom: 10 }}
+                      rules={[{ required: true, message: 'Please input your password!' }]}
+                    >
+                      <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder="Password"
+                        className="auth-input"
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="confirm_password"
+                      style={{ marginBottom: 10 }}
+                      dependencies={['password']}
+                      hasFeedback
+                      rules={[
+                        { required: true, message: 'Please confirm your password!' },
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (!value || getFieldValue('password') === value) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(new Error('The two passwords that you entered do not match!'));
+                          },
+                        }),
+                      ]}
+                    >
+                      <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder="Confirm"
+                        className="auth-input"
+                      />
+                    </Form.Item>
+
+
+
 
                     <Form.Item style={{ marginBottom: 0 }}>
                       <Button
@@ -189,6 +234,7 @@ const Hero = () => {
                         htmlType="submit"
                         block
                         size="large"
+                        loading={loading}
                         style={{
                           height: '48px',
                           borderRadius: '12px',
@@ -231,11 +277,14 @@ const Hero = () => {
                     Thank You!
                   </Title>
                   <Paragraph style={{ fontSize: '16px', color: '#64748b', marginBottom: '32px' }}>
-                    Your registration has been received successfully. Our team will contact you shortly to get you started.
+                    Your registration has been completed successfully.You can now sign in to the app using your valid credentials from the signin page.Once logged in, you can explore all IntelliHR features for up to 5 employees at no cost.
                   </Paragraph>
                   <Button
                     type="default"
-                    onClick={() => setFormSubmitted(false)}
+                    onClick={() => {
+                      setFormSubmitted(false);
+                      form.resetFields();
+                    }}
                     style={{ borderRadius: '30px' }}
                   >
                     Register Another Company
@@ -252,7 +301,6 @@ const Hero = () => {
               background: 'transparent',
               boxShadow: 'none'
             }}>
-              {/* Decorative glows behind image */}
               <div style={{
                 position: 'absolute',
                 top: '20%',

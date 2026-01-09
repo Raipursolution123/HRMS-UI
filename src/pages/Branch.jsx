@@ -16,7 +16,7 @@ const Branch = () => {
   const [editingBranch, setEditingBranch] = useState(null);
   const [searchText, setSearchText] = useState('');
 
-  const { branches, loading, error, refetch, addBranch, updateBranch, deleteBranch } = useBranches();
+  const { branches, loading, error, total, refetch, addBranch, updateBranch, deleteBranch } = useBranches();
 
   const { Toast, contextHolder } = useToast();
 
@@ -48,7 +48,7 @@ const Branch = () => {
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchText(value);
-    setCurrentPage(1); // reset to first page on search
+    setCurrentPage(1);
   };
 
   const columns = [
@@ -58,7 +58,7 @@ const Branch = () => {
       key: 'sl',
       width: 80,
       align: 'center',
-      render: (_, __, index) => index + 1,
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
       title: 'Name',
@@ -132,7 +132,7 @@ const Branch = () => {
   const pagination = {
     current: currentPage,
     pageSize: pageSize,
-    total: 74, // backend pagination count can be handled later if available
+    total: total || 0,
     showSizeChanger: true,
     showQuickJumper: true,
     showTotal: (total, range) =>
@@ -161,22 +161,7 @@ const Branch = () => {
           </Button>
         }
       >
-        <Row className="table-page-filters" align="middle" justify="space-between" gutter={[16, 16]}>
-          <Col xs={24} sm={12} md={8}>
-            <span style={{ marginRight: 8 }}>Show</span>
-            <Select
-              value={pageSize}
-              onChange={(value) => setPageSize(value)}
-              className="table-page-select"
-              style={{ width: 80, marginRight: 8 }}
-            >
-              <Option value={10}>10</Option>
-              <Option value={20}>20</Option>
-              <Option value={50}>50</Option>
-              <Option value={100}>100</Option>
-            </Select>
-            <span>entries</span>
-          </Col>
+        <Row className="table-page-filters" align="middle" justify="end">
           <Col xs={24} sm={12} md={8}>
             <Input.Search
               placeholder="Search branch..."
